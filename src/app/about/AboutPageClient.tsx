@@ -87,7 +87,7 @@ export function AboutPageClient() {
             >
               <div className="relative rounded-2xl overflow-hidden shadow-2xl">
                 <Image
-                  src="/images/steve-mark.jpg"
+                  src="/images/ab.jpg"
                   alt="Steve and Mark Tamboli, co-owners of Algonquin Nurses"
                   width={600}
                   height={450}
