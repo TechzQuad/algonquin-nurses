@@ -70,7 +70,7 @@ export function AboutPageClient() {
         subtitle="Our Story"
         title="Caring for St. Louis Families Since 1987"
         description="A family-owned home health care company built on trust, compassion, and a commitment to helping you maintain independence in your own home."
-        imageSrc="/images/aglonquin-team.jpg"
+        imageSrc="/images/ab.jpg"
         imageAlt="Algonquin Nurses team"
         compact
       />
@@ -87,7 +87,7 @@ export function AboutPageClient() {
             >
               <div className="relative rounded-2xl overflow-hidden shadow-2xl">
                 <Image
-                  src="/images/ab.jpg"
+                  src="/images/steve-mark.jpg"
                   alt="Steve and Mark Tamboli, co-owners of Algonquin Nurses"
                   width={600}
                   height={450}
