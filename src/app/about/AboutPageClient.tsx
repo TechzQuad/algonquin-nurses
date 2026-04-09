@@ -78,27 +78,7 @@ export function AboutPageClient() {
       {/* Mission */}
       <section className="py-20 lg:py-28 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-            >
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-                <Image
-                  src="/images/ab.jpg"
-                  alt="Steve and Mark Tamboli, co-owners of Algonquin Nurses"
-                  width={600}
-                  height={450}
-                  className="w-full h-auto object-cover"
-                />
-              </div>
-              <div className="mt-4 text-center">
-                <p className="text-sm text-neutral-500">Steve & Mark Tamboli — Co-Owners</p>
-              </div>
-            </motion.div>
-
+          <div className="max-w-3xl mx-auto">
             <motion.div
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -108,17 +88,17 @@ export function AboutPageClient() {
               <SectionHeading
                 label="Our Mission"
                 title="Delivering Excellence in Home Health Care"
-                center={false}
+                center
               />
-              <blockquote className="border-l-4 border-primary pl-5 mb-8">
+              <blockquote className="border-l-4 border-primary pl-5 mb-8 text-center">
                 <p className="text-lg text-neutral-700 italic leading-relaxed">
                   &ldquo;To provide for the effective and efficient delivery of health care and health-related services in areas of identifiable need, for the benefit of individuals, family, and society.&rdquo;
                 </p>
               </blockquote>
-              <p className="text-neutral-600 leading-relaxed mb-6">
+              <p className="text-neutral-600 leading-relaxed mb-6 text-center">
                 Algonquin Nurses was founded in 1987 and began by staffing nurses and CNAs for hospitals and nursing homes. Mark Tamboli joined his brother Steve and their mother Mary in 1990 to establish the Medicaid and Private Duty Division.
               </p>
-              <p className="text-neutral-600 leading-relaxed">
+              <p className="text-neutral-600 leading-relaxed text-center">
                 Sister Anne joined in 1992 to manage the Medicare Skilled Nursing Department. Today, the company operates three main divisions, continuing the family tradition of providing compassionate, quality care throughout the St. Louis metro area.
               </p>
             </motion.div>
