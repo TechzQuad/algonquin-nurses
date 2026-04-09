@@ -42,7 +42,7 @@ export function Footer() {
               <Image src="/images/mo-council-in-home-svs.jpg" alt="Missouri Council In-Home Services" width={60} height={40} className="h-8 w-auto rounded bg-white p-0.5" />
               <Image src="/images/home-care-assc.jpg" alt="Home Care Alliance" width={60} height={40} className="h-8 w-auto rounded bg-white p-0.5" />
               <Image src="/images/mo-alliance-for-homecare.jpg" alt="Missouri Alliance for Home Care" width={60} height={40} className="h-8 w-auto rounded bg-white p-0.5" />
-              <Image src="/images/chamber-of-commerce_footer_logo.png" alt="Chamber of Commerce" width={60} height={40} className="h-8 w-auto rounded bg-white p-0.5" />
+              <Image src="/images/f4.png" alt="Chamber of Commerce" width={60} height={40} className="h-8 w-auto rounded bg-white p-0.5" />
             </div>
           </div>
 
