@@ -140,7 +140,7 @@ export function Footer() {
             &copy; {new Date().getFullYear()} Algonquin Nurses Home Health Care I, LLC. All rights reserved.
           </p>
           <div className="flex gap-6">
-            <Link href="/about#privacy" className="text-sm text-white/60 hover:text-white transition-colors">
+            <Link href="/privacy" className="text-sm text-white/60 hover:text-white transition-colors">
               Privacy Policy
             </Link>
             <Link href="/contact" className="text-sm text-white/60 hover:text-white transition-colors">
