@@ -46,5 +46,33 @@ export const Posts: CollectionConfig = {
       type: "relationship",
       relationTo: "users",
     },
+    {
+      name: "seo",
+      type: "group",
+      label: "SEO",
+      fields: [
+        {
+          name: "metaTitle",
+          type: "text",
+          admin: { description: "Overrides the post title in <title> and og:title (50–60 chars ideal)" },
+        },
+        {
+          name: "metaDescription",
+          type: "textarea",
+          admin: { description: "Meta description (140–160 chars ideal). Falls back to excerpt." },
+        },
+        {
+          name: "keywords",
+          type: "text",
+          admin: { description: "Comma-separated focus keywords" },
+        },
+        {
+          name: "noIndex",
+          type: "checkbox",
+          defaultValue: false,
+          admin: { description: "Hide this post from search engines" },
+        },
+      ],
+    },
   ],
 };

@@ -298,6 +298,24 @@ export interface Post {
   } | null;
   publishedAt?: string | null;
   author?: (number | null) | User;
+  seo?: {
+    /**
+     * Overrides the post title in <title> and og:title (50–60 chars ideal)
+     */
+    metaTitle?: string | null;
+    /**
+     * Meta description (140–160 chars ideal). Falls back to excerpt.
+     */
+    metaDescription?: string | null;
+    /**
+     * Comma-separated focus keywords
+     */
+    keywords?: string | null;
+    /**
+     * Hide this post from search engines
+     */
+    noIndex?: boolean | null;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -599,6 +617,14 @@ export interface PostsSelect<T extends boolean = true> {
   content?: T;
   publishedAt?: T;
   author?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        keywords?: T;
+        noIndex?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }
