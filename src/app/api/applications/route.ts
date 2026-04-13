@@ -25,7 +25,8 @@ export async function POST(request: Request) {
         lastName: String(lastName),
         email: String(email),
         phone: String(phone),
-        position: position ? String(position) : undefined,
+        position: (position ? String(position) : undefined) as
+          | "cna" | "hha" | "rn" | "lpn" | "other" | undefined,
         experience: experience ? String(experience) : undefined,
       },
     });

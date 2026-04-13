@@ -25,7 +25,8 @@ export async function POST(request: Request) {
         referrerPhone: String(referrerPhone),
         clientName: String(clientName),
         clientPhone: clientPhone ? String(clientPhone) : undefined,
-        service: service ? String(service) : undefined,
+        service: (service ? String(service) : undefined) as
+          | "private-duty" | "medicaid" | "cds" | "hcy" | "veterans" | "other" | undefined,
         notes: notes ? String(notes) : undefined,
       },
     });

@@ -24,7 +24,8 @@ export async function POST(request: Request) {
         lastName: String(lastName),
         email: String(email),
         phone: String(phone),
-        service: service ? String(service) : undefined,
+        service: (service ? String(service) : undefined) as
+          | "private-duty" | "medicaid" | "cds" | "hcy" | "veterans" | "other" | undefined,
         message: String(message),
       },
     });

@@ -26,7 +26,8 @@ export async function POST(request: Request) {
       collection: "feedback",
       data: {
         name: name ? String(name) : undefined,
-        relationship: relationship ? String(relationship) : undefined,
+        relationship: (relationship ? String(relationship) : undefined) as
+          | "client" | "family" | "friend" | "other" | undefined,
         rating: safeRating,
         message: String(message),
       },
