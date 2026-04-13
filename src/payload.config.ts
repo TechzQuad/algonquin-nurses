@@ -11,6 +11,10 @@ import { Services } from "./collections/Services.ts";
 import { Team } from "./collections/Team.ts";
 import { Testimonials } from "./collections/Testimonials.ts";
 import { Posts } from "./collections/Posts.ts";
+import { ContactSubmissions } from "./collections/ContactSubmissions.ts";
+import { Referrals } from "./collections/Referrals.ts";
+import { Feedback } from "./collections/Feedback.ts";
+import { Applications } from "./collections/Applications.ts";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -22,7 +26,18 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media, Services, Team, Testimonials, Posts],
+  collections: [
+    Users,
+    Media,
+    Services,
+    Team,
+    Testimonials,
+    Posts,
+    ContactSubmissions,
+    Referrals,
+    Feedback,
+    Applications,
+  ],
   editor: lexicalEditor({}),
   secret: process.env.PAYLOAD_SECRET || "",
   typescript: {

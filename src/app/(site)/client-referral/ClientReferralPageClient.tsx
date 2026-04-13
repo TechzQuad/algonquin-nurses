@@ -9,6 +9,32 @@ import { CTASection } from "@/components/CTASection";
 
 export function ClientReferralPageClient() {
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setError(null);
+    const formData = new FormData(e.currentTarget);
+    const payload = Object.fromEntries(formData.entries());
+    try {
+      const res = await fetch("/api/referrals", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Failed to submit");
+      }
+      setSubmitted(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <>
@@ -91,17 +117,17 @@ export function ClientReferralPageClient() {
               </p>
             </motion.div>
           ) : (
-            <form onSubmit={(e) => { e.preventDefault(); setSubmitted(true); }} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div className="bg-white rounded-xl p-6 border border-neutral-100">
                 <h3 className="font-bold text-neutral-900 mb-4">Your Information</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="refYourName" className="block text-sm font-medium text-neutral-700 mb-1.5">Your Name *</label>
-                    <input type="text" id="refYourName" required className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors" />
+                    <input type="text" id="refYourName" name="referrerName" required className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors" />
                   </div>
                   <div>
                     <label htmlFor="refYourPhone" className="block text-sm font-medium text-neutral-700 mb-1.5">Your Phone *</label>
-                    <input type="tel" id="refYourPhone" required className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors" />
+                    <input type="tel" id="refYourPhone" name="referrerPhone" required className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors" />
                   </div>
                 </div>
               </div>
@@ -112,16 +138,16 @@ export function ClientReferralPageClient() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label htmlFor="refClientName" className="block text-sm font-medium text-neutral-700 mb-1.5">Client Name *</label>
-                      <input type="text" id="refClientName" required className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors" />
+                      <input type="text" id="refClientName" name="clientName" required className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors" />
                     </div>
                     <div>
                       <label htmlFor="refClientPhone" className="block text-sm font-medium text-neutral-700 mb-1.5">Client Phone</label>
-                      <input type="tel" id="refClientPhone" className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors" />
+                      <input type="tel" id="refClientPhone" name="clientPhone" className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors" />
                     </div>
                   </div>
                   <div>
                     <label htmlFor="refService" className="block text-sm font-medium text-neutral-700 mb-1.5">Service Needed</label>
-                    <select id="refService" className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors bg-white">
+                    <select id="refService" name="service" className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors bg-white">
                       <option value="">Select a service...</option>
                       <option value="private-duty">Private Duty Care</option>
                       <option value="medicaid">Medicaid In-Home Care</option>
@@ -133,14 +159,16 @@ export function ClientReferralPageClient() {
                   </div>
                   <div>
                     <label htmlFor="refNotes" className="block text-sm font-medium text-neutral-700 mb-1.5">Additional Notes</label>
-                    <textarea id="refNotes" rows={4} className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors resize-none" placeholder="Any additional information about the client's needs..." />
+                    <textarea id="refNotes" name="notes" rows={4} className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors resize-none" placeholder="Any additional information about the client's needs..." />
                   </div>
                 </div>
               </div>
 
-              <button type="submit" className="w-full sm:w-auto px-8 py-3.5 bg-accent hover:bg-accent-light text-white font-semibold rounded-lg transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-2">
+              {error && <p className="text-sm text-red-600">{error}</p>}
+
+              <button type="submit" disabled={submitting} className="w-full sm:w-auto px-8 py-3.5 bg-accent hover:bg-accent-light text-white font-semibold rounded-lg transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed">
                 <Send className="w-4 h-4" />
-                Submit Referral
+                {submitting ? "Submitting..." : "Submit Referral"}
               </button>
             </form>
           )}

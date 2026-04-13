@@ -45,6 +45,32 @@ const openings = [
 
 export function CareersPageClient() {
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setError(null);
+    const formData = new FormData(e.currentTarget);
+    const payload = Object.fromEntries(formData.entries());
+    try {
+      const res = await fetch("/api/applications", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Failed to submit");
+      }
+      setSubmitted(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <>
@@ -156,30 +182,30 @@ export function CareersPageClient() {
               </p>
             </motion.div>
           ) : (
-            <form onSubmit={(e) => { e.preventDefault(); setSubmitted(true); }} className="space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-5">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
                   <label htmlFor="appFirstName" className="block text-sm font-medium text-neutral-700 mb-1.5">First Name *</label>
-                  <input type="text" id="appFirstName" required className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors" />
+                  <input type="text" id="appFirstName" name="firstName" required className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors" />
                 </div>
                 <div>
                   <label htmlFor="appLastName" className="block text-sm font-medium text-neutral-700 mb-1.5">Last Name *</label>
-                  <input type="text" id="appLastName" required className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors" />
+                  <input type="text" id="appLastName" name="lastName" required className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors" />
                 </div>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
                   <label htmlFor="appEmail" className="block text-sm font-medium text-neutral-700 mb-1.5">Email *</label>
-                  <input type="email" id="appEmail" required className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors" />
+                  <input type="email" id="appEmail" name="email" required className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors" />
                 </div>
                 <div>
                   <label htmlFor="appPhone" className="block text-sm font-medium text-neutral-700 mb-1.5">Phone *</label>
-                  <input type="tel" id="appPhone" required className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors" />
+                  <input type="tel" id="appPhone" name="phone" required className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors" />
                 </div>
               </div>
               <div>
                 <label htmlFor="appPosition" className="block text-sm font-medium text-neutral-700 mb-1.5">Position Interested In</label>
-                <select id="appPosition" className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors bg-white">
+                <select id="appPosition" name="position" className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors bg-white">
                   <option value="">Select a position...</option>
                   <option value="cna">Certified Nursing Assistant (CNA)</option>
                   <option value="hha">Home Health Aide</option>
@@ -190,11 +216,12 @@ export function CareersPageClient() {
               </div>
               <div>
                 <label htmlFor="appExperience" className="block text-sm font-medium text-neutral-700 mb-1.5">Experience & Qualifications</label>
-                <textarea id="appExperience" rows={4} className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors resize-none" placeholder="Tell us about your experience and certifications..." />
+                <textarea id="appExperience" name="experience" rows={4} className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors resize-none" placeholder="Tell us about your experience and certifications..." />
               </div>
-              <button type="submit" className="w-full sm:w-auto px-8 py-3.5 bg-accent hover:bg-accent-light text-white font-semibold rounded-lg transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-2">
+              {error && <p className="text-sm text-red-600">{error}</p>}
+              <button type="submit" disabled={submitting} className="w-full sm:w-auto px-8 py-3.5 bg-accent hover:bg-accent-light text-white font-semibold rounded-lg transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed">
                 <Send className="w-4 h-4" />
-                Submit Application
+                {submitting ? "Submitting..." : "Submit Application"}
               </button>
             </form>
           )}
