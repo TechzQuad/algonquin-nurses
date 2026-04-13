@@ -285,8 +285,8 @@ export function PrivacyPageClient() {
                   <p>10135 Manchester Rd., St. Louis, MO 63122</p>
                   <p>
                     Phone:{" "}
-                    <a href="tel:3148228158" className="text-primary hover:underline">
-                      (314) 822-8158
+                    <a href="tel:6362741870" className="text-primary hover:underline">
+                      (636) 274-1870
                     </a>
                   </p>
                 </div>

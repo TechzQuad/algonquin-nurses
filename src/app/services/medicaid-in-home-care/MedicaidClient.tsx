@@ -60,7 +60,7 @@ export function MedicaidClient() {
         {
           question: "How many hours of service will I receive?",
           answer:
-            "Service hours vary by individual based on calculated care points and your assessment results. For questions about your specific hours, contact the state at (866) 835-3505 or Algonquin Nurses at (314) 822-8158.",
+            "Service hours vary by individual based on calculated care points and your assessment results. For questions about your specific hours, contact the state at (866) 835-3505 or Algonquin Nurses at (636) 274-1870.",
         },
         {
           question: "What areas do you serve?",

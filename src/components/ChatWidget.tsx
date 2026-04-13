@@ -12,7 +12,7 @@ const QA: { keywords: string[]; answer: string }[] = [
   {
     keywords: ["private duty", "private", "duty"],
     answer:
-      "Our Private Duty Care provides one-on-one assistance with daily living activities, personal care, and companionship. Services are available 24/7 and tailored to each client's needs. Call (314) 822-8158 to learn more.",
+      "Our Private Duty Care provides one-on-one assistance with daily living activities, personal care, and companionship. Services are available 24/7 and tailored to each client's needs. Call (636) 274-1870 to learn more.",
   },
   {
     keywords: ["medicaid", "in-home", "in home"],
@@ -37,7 +37,7 @@ const QA: { keywords: string[]; answer: string }[] = [
   {
     keywords: ["career", "job", "hire", "hiring", "work", "apply", "employment"],
     answer:
-      "We're always looking for compassionate caregivers! Visit our Careers page at /careers or call (314) 822-8158 to learn about open positions.",
+      "We're always looking for compassionate caregivers! Visit our Careers page at /careers or call (636) 274-1870 to learn about open positions.",
   },
   {
     keywords: ["hours", "available", "24", "weekend", "holiday"],
@@ -62,7 +62,7 @@ const QA: { keywords: string[]; answer: string }[] = [
   {
     keywords: ["insurance", "pay", "cost", "price", "accept"],
     answer:
-      "We accept Medicaid and work with various insurance providers. For private duty care, we offer competitive rates. Please call (314) 822-8158 to discuss payment options.",
+      "We accept Medicaid and work with various insurance providers. For private duty care, we offer competitive rates. Please call (636) 274-1870 to discuss payment options.",
   },
   {
     keywords: ["referral", "refer"],
@@ -94,7 +94,7 @@ function findAnswer(input: string): string {
       return qa.answer;
     }
   }
-  return "I'm not sure about that. Please call us at (314) 822-8158 or visit our Contact page for assistance. You can also ask me about our services, locations, or careers!";
+  return "I'm not sure about that. Please call us at (636) 274-1870 or visit our Contact page for assistance. You can also ask me about our services, locations, or careers!";
 }
 
 export function ChatWidget() {

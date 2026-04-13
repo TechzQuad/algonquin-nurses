@@ -78,7 +78,7 @@ export function VeteransCareClient() {
         {
           question: "How do I get started?",
           answer:
-            "Contact us at (314) 822-8158 or visit our contact page. We'll help determine your eligibility and guide you through the process of receiving home care services.",
+            "Contact us at (636) 274-1870 or visit our contact page. We'll help determine your eligibility and guide you through the process of receiving home care services.",
         },
       ]}
       ctaTitle="We're Here for Our Veterans"

@@ -49,7 +49,7 @@ export function YouthProgramClient() {
         {
           question: "How do I apply for the HCY Program?",
           answer:
-            "Contact us at (314) 822-8158 or visit our contact page. We'll help determine your child's eligibility and guide you through the enrollment process with MO HealthNet.",
+            "Contact us at (636) 274-1870 or visit our contact page. We'll help determine your child's eligibility and guide you through the enrollment process with MO HealthNet.",
         },
       ]}
       ctaTitle="Get Help for Your Child"

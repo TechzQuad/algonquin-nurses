@@ -12,7 +12,7 @@ export function SchemaMarkup() {
         foundingDate: "1987",
         description:
           "Professional home health care services in St. Louis since 1987. Private duty care, Medicaid services, consumer directed services, youth programs, and veterans care.",
-        telephone: "+1-314-822-8158",
+        telephone: "+1-636-274-1870",
         areaServed: [
           { "@type": "City", name: "St. Louis", addressRegion: "MO" },
           { "@type": "County", name: "St. Louis County", addressRegion: "MO" },
@@ -33,7 +33,7 @@ export function SchemaMarkup() {
           "@type": "ServiceChannel",
           servicePhone: {
             "@type": "ContactPoint",
-            telephone: "+1-314-822-8158",
+            telephone: "+1-636-274-1870",
             contactType: "customer service",
             availableLanguage: "English",
           },
