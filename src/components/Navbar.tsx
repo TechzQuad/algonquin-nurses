@@ -153,6 +153,9 @@ export function Navbar() {
                 </AnimatePresence>
               </div>
 
+              <Link href="/blog" className="px-4 py-2 text-sm font-medium text-neutral-700 hover:text-primary rounded-lg hover:bg-neutral-50 transition-colors">
+                Blog
+              </Link>
               <Link href="/feedback" className="px-4 py-2 text-sm font-medium text-neutral-700 hover:text-primary rounded-lg hover:bg-neutral-50 transition-colors">
                 Feedback
               </Link>
@@ -233,6 +236,9 @@ export function Navbar() {
 
                 <div className="border-t border-neutral-100 my-2" />
 
+                <Link href="/blog" onClick={() => setIsOpen(false)} className="block px-3 py-2.5 text-neutral-700 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors">
+                  Blog
+                </Link>
                 <Link href="/feedback" onClick={() => setIsOpen(false)} className="block px-3 py-2.5 text-neutral-700 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors">
                   Feedback
                 </Link>
