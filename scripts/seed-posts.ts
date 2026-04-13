@@ -432,7 +432,10 @@ async function ensureMedia(
     limit: 1,
   });
   if (existing.docs[0]) {
-    return (existing.docs[0] as { id: string | number }).id;
+    await payload.delete({
+      collection: "media",
+      id: (existing.docs[0] as { id: string | number }).id,
+    });
   }
   const filePath = path.resolve(process.cwd(), "public/images/blog", filename);
   const created = await payload.create({

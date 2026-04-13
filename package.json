@@ -16,6 +16,7 @@
     "@payloadcms/db-postgres": "^3.82.1",
     "@payloadcms/next": "^3.82.1",
     "@payloadcms/richtext-lexical": "^3.82.1",
+    "@payloadcms/storage-vercel-blob": "^3.82.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.38.0",
     "graphql": "^16.13.2",
