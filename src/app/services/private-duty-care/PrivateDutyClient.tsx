@@ -27,7 +27,7 @@ export function PrivateDutyClient() {
         "Hair Services & Social Outings",
         "Meal Preparation & Cleanup",
         "Light Housekeeping & Laundry",
-        "Bed Changes & Plant Care",
+        "Bed Changes",
         "Alzheimer's Care",
         "Hospice Care Support",
         "Respite Services",
