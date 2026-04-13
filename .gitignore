@@ -42,3 +42,6 @@ next-env.d.ts
 
 # firecrawl scratch
 .firecrawl/
+
+# payload media uploads (re-generated from sources in public/images/)
+/media/

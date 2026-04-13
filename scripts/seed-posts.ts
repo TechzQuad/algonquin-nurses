@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+import path from "node:path";
 import { getPayload } from "payload";
 import config from "../src/payload.config.ts";
 
@@ -91,6 +92,7 @@ type PostSeed = {
   excerpt: string;
   publishedAtDaysAgo: number;
   content: Block[];
+  image: { file: string; alt: string };
 };
 
 const posts: PostSeed[] = [
@@ -100,6 +102,10 @@ const posts: PostSeed[] = [
     excerpt:
       "Most older adults want to stay in their own homes as they age. Learn how professional home health care turns that wish into a realistic, safe plan.",
     publishedAtDaysAgo: 2,
+    image: {
+      file: "aging-in-place.jpg",
+      alt: "Caregiver supporting an elderly couple at home",
+    },
     content: [
       {
         type: "p",
@@ -144,6 +150,10 @@ const posts: PostSeed[] = [
     excerpt:
       "Missouri's MO HealthNet covers in-home services for eligible seniors and adults with disabilities. Here is how the program works and how to apply.",
     publishedAtDaysAgo: 9,
+    image: {
+      file: "medicaid-missouri.jpg",
+      alt: "Hand filling out application paperwork on a desk",
+    },
     content: [
       {
         type: "p",
@@ -212,6 +222,10 @@ const posts: PostSeed[] = [
     excerpt:
       "Missouri's CDS program lets eligible adults choose their own paid caregiver — even a spouse, adult child, neighbor, or friend. Here is how it works.",
     publishedAtDaysAgo: 17,
+    image: {
+      file: "consumer-directed-services.jpg",
+      alt: "Family caregiver holding hands with an elderly loved one",
+    },
     content: [
       {
         type: "p",
@@ -259,6 +273,10 @@ const posts: PostSeed[] = [
     excerpt:
       "The changes that signal a loved one needs support are often small and easy to miss. Here are the ten signs families should not ignore.",
     publishedAtDaysAgo: 24,
+    image: {
+      file: "signs-aging-parent.jpg",
+      alt: "Adult daughter having a heartfelt conversation with her senior mother at home",
+    },
     content: [
       {
         type: "p",
@@ -303,6 +321,10 @@ const posts: PostSeed[] = [
     excerpt:
       "Veterans have earned access to home care benefits that most families do not know exist. Here is a plain-language guide to what is available and how to apply.",
     publishedAtDaysAgo: 31,
+    image: {
+      file: "veterans-home-care.jpg",
+      alt: "American flags honoring veterans",
+    },
     content: [
       {
         type: "p",
@@ -351,6 +373,10 @@ const posts: PostSeed[] = [
     excerpt:
       "Missouri's Healthy Children and Youth (HCY) program provides in-home services for medically complex children from birth through age 20. Here is how it works.",
     publishedAtDaysAgo: 40,
+    image: {
+      file: "hcy-program-children.jpg",
+      alt: "Pediatric nurse caring for an infant patient",
+    },
     content: [
       {
         type: "p",
@@ -395,6 +421,28 @@ const posts: PostSeed[] = [
   },
 ];
 
+async function ensureMedia(
+  payload: Awaited<ReturnType<typeof getPayload>>,
+  filename: string,
+  alt: string,
+): Promise<string | number> {
+  const existing = await payload.find({
+    collection: "media",
+    where: { filename: { equals: filename } },
+    limit: 1,
+  });
+  if (existing.docs[0]) {
+    return (existing.docs[0] as { id: string | number }).id;
+  }
+  const filePath = path.resolve(process.cwd(), "public/images/blog", filename);
+  const created = await payload.create({
+    collection: "media",
+    data: { alt },
+    filePath,
+  });
+  return (created as { id: string | number }).id;
+}
+
 async function main() {
   const payload = await getPayload({ config: await config });
   console.log(`Seeding ${posts.length} posts...`);
@@ -410,12 +458,15 @@ async function main() {
       Date.now() - p.publishedAtDaysAgo * 24 * 60 * 60 * 1000,
     ).toISOString();
 
+    const coverImage = await ensureMedia(payload, p.image.file, p.image.alt);
+
     const data = {
       title: p.title,
       slug: p.slug,
       excerpt: p.excerpt,
       publishedAt,
       content: toLexical(p.content),
+      coverImage,
     };
 
     if (existing.docs[0]) {
