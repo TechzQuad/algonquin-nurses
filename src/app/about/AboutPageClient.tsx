@@ -1,8 +1,7 @@
 "use client";
 
-import Image from "next/image";
 import { motion } from "framer-motion";
-import { Heart, Target, Shield, Users, Award, HandHeart, CheckCircle2 } from "lucide-react";
+import { Heart, Target, Shield, Users, Award, HandHeart, CheckCircle2, Home, GraduationCap, HeartHandshake } from "lucide-react";
 import { Hero } from "@/components/Hero";
 import { SectionHeading } from "@/components/SectionHeading";
 import { CTASection } from "@/components/CTASection";
@@ -92,10 +91,10 @@ export function AboutPageClient() {
                 </p>
               </blockquote>
               <p className="text-neutral-600 leading-relaxed mb-6 text-center">
-                Algonquin Nurses was founded in 1987 and began by staffing nurses and CNAs for hospitals and nursing homes. Mark Tamboli joined his brother Steve and their mother Mary in 1990 to establish the Medicaid and Private Duty Division.
+                Steve and Mary Tamboli started Algonquin Nurses Home Health Care in 1987, naming the company after one of the most prestigious hotels in New York — known for its lofty standards. The company began by staffing nursing homes and hospitals, then expanded into home care.
               </p>
               <p className="text-neutral-600 leading-relaxed text-center">
-                Sister Anne joined in 1992 to manage the Medicare Skilled Nursing Department. Today, the company operates three main divisions, continuing the family tradition of providing compassionate, quality care throughout the St. Louis metro area.
+                Mary has since retired, and Steve runs the company while remaining active in our community. He is highly involved in his family&apos;s Brenden Friday Backpack program, which provides meals for school children across the St. Louis area.
               </p>
             </motion.div>
           </div>
@@ -167,8 +166,67 @@ export function AboutPageClient() {
         </div>
       </section>
 
+      {/* Our Approach */}
+      <section className="py-20 lg:py-28 bg-surface">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <SectionHeading
+            label="Our Approach"
+            title="Quality Care, Right at Home"
+            description="Helping elderly and disabled individuals stay in their homes with dignity, safety, and expert support."
+          />
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 mb-12">
+            {[
+              {
+                icon: Home,
+                title: "Independence at Home",
+                desc: "Our first goal is to help elderly and disabled individuals stay in their own homes as long as they can — surrounded by the people and places they love.",
+              },
+              {
+                icon: GraduationCap,
+                title: "Skilled, Trained Team",
+                desc: "Our team brings a comprehensive skill set and is well-equipped to manage every responsibility in your home. The level of training and professionalism is commendable.",
+              },
+              {
+                icon: HeartHandshake,
+                title: "Hospice Coordination",
+                desc: "We work in close coordination with hospice providers to support patients and their families by offering specialized, compassionate services.",
+              },
+            ].map((item, index) => (
+              <motion.div
+                key={item.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: index * 0.1 }}
+                className="bg-white rounded-2xl p-8 shadow-sm border border-neutral-100 hover:shadow-md transition-shadow"
+              >
+                <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mb-5">
+                  <item.icon className="w-7 h-7 text-primary" />
+                </div>
+                <h3 className="font-bold text-neutral-900 mb-3 text-lg">{item.title}</h3>
+                <p className="text-neutral-600 text-sm leading-relaxed">{item.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="max-w-4xl mx-auto bg-gradient-to-br from-primary to-primary-dark rounded-3xl p-10 lg:p-12 text-center shadow-lg"
+          >
+            <Heart className="w-10 h-10 text-accent-light mx-auto mb-5" />
+            <p className="text-white text-lg lg:text-xl leading-relaxed">
+              We pride ourselves on the quality of care our staff bring to your home. We take pride in knowing that our team helps families care for their loved ones safely and comfortably — right where they belong.
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
       {/* Privacy section */}
-      <section id="privacy" className="py-20 lg:py-28 bg-surface">
+      <section id="privacy" className="py-20 lg:py-28 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
           <SectionHeading
             label="Privacy Practices"
