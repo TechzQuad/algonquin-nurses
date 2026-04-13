@@ -52,11 +52,6 @@ const timeline = [
     desc: "Mark Tamboli joined his brother Steve and their mother Mary to establish the Medicaid and Private Duty Division.",
   },
   {
-    year: "1992",
-    title: "Medicare Expansion",
-    desc: "Sister Anne joined the team to manage the Medicare Skilled Nursing Department, expanding services significantly.",
-  },
-  {
     year: "Today",
     title: "Three Divisions Strong",
     desc: "The company now operates three main divisions with offices across the St. Louis metro, serving thousands of families.",
