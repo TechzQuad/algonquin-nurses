@@ -15,6 +15,7 @@ interface HeroProps {
   showPhones?: boolean;
   overlay?: "dark" | "blue";
   compact?: boolean;
+  imagePosition?: string;
 }
 
 export function Hero({
@@ -27,6 +28,7 @@ export function Hero({
   showPhones = false,
   overlay = "blue",
   compact = false,
+  imagePosition,
 }: HeroProps) {
   return (
     <section className={`relative ${compact ? "min-h-[340px]" : "min-h-[600px] lg:min-h-[700px]"} flex items-center overflow-hidden`}>
@@ -36,6 +38,7 @@ export function Hero({
         alt={imageAlt}
         fill
         className="object-cover"
+        style={imagePosition ? { objectPosition: imagePosition } : undefined}
         priority
         sizes="100vw"
       />

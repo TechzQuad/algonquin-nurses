@@ -65,8 +65,9 @@ export function AboutPageClient() {
         subtitle="Our Story"
         title="Caring for St. Louis Families Since 1987"
         description="A family-owned home health care company built on trust, compassion, and a commitment to helping you maintain independence in your own home."
-        imageSrc="/images/aglonquin-team.jpg"
+        imageSrc="/images/about.png"
         imageAlt="Algonquin Nurses team"
+        imagePosition="center 20%"
         compact
       />
 
