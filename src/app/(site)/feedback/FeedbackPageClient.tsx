@@ -5,10 +5,10 @@ import { motion } from "framer-motion";
 import { Send, Star } from "lucide-react";
 import { Hero } from "@/components/Hero";
 import { SectionHeading } from "@/components/SectionHeading";
-import { Testimonials } from "@/components/Testimonials";
+import { Testimonials, type TestimonialItem } from "@/components/Testimonials";
 import { CTASection } from "@/components/CTASection";
 
-export function FeedbackPageClient() {
+export function FeedbackPageClient({ testimonials = [] }: { testimonials?: TestimonialItem[] }) {
   const [submitted, setSubmitted] = useState(false);
   const [rating, setRating] = useState(0);
   const [submitting, setSubmitting] = useState(false);
@@ -58,7 +58,7 @@ export function FeedbackPageClient() {
             title="What Our Clients Say"
             description="Read what families across St. Louis have to say about their experience with Algonquin Nurses."
           />
-          <Testimonials />
+          <Testimonials items={testimonials} />
         </div>
       </section>
 

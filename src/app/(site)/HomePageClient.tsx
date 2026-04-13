@@ -17,7 +17,7 @@ import {
 import { Hero } from "@/components/Hero";
 import { SectionHeading } from "@/components/SectionHeading";
 import { ServiceCard } from "@/components/ServiceCard";
-import { Testimonials } from "@/components/Testimonials";
+import { Testimonials, type TestimonialItem } from "@/components/Testimonials";
 import { CTASection } from "@/components/CTASection";
 import { AnimatedCounter } from "@/components/AnimatedCounter";
 
@@ -85,7 +85,13 @@ type BlogPostPreview = {
   coverImage?: { url?: string | null; alt?: string | null } | null;
 };
 
-export function HomePageClient({ posts = [] }: { posts?: BlogPostPreview[] }) {
+export function HomePageClient({
+  posts = [],
+  testimonials = [],
+}: {
+  posts?: BlogPostPreview[];
+  testimonials?: TestimonialItem[];
+}) {
   return (
     <>
       {/* Hero */}
@@ -369,7 +375,7 @@ export function HomePageClient({ posts = [] }: { posts?: BlogPostPreview[] }) {
             title="What Our Clients Say"
             description="Hear from the families we serve about their experience with Algonquin Nurses Home Health."
           />
-          <Testimonials />
+          <Testimonials items={testimonials} />
         </div>
       </section>
 

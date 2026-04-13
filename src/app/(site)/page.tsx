@@ -1,5 +1,6 @@
 import { HomePageClient } from "./HomePageClient";
 import { getPayloadClient } from "@/lib/payload";
+import type { TestimonialItem } from "@/components/Testimonials";
 
 export const revalidate = 300;
 
@@ -28,7 +29,25 @@ async function getLatestPosts(): Promise<BlogPostPreview[]> {
   }
 }
 
+async function getTestimonials(): Promise<TestimonialItem[]> {
+  try {
+    const payload = await getPayloadClient();
+    const { docs } = await payload.find({
+      collection: "testimonials",
+      where: { featured: { equals: true } },
+      sort: "-updatedAt",
+      limit: 6,
+      depth: 0,
+    });
+    return (docs as Array<{ author: string; quote: string; location?: string | null }>).map(
+      (d) => ({ name: d.author, text: d.quote, location: d.location ?? undefined }),
+    );
+  } catch {
+    return [];
+  }
+}
+
 export default async function HomePage() {
-  const posts = await getLatestPosts();
-  return <HomePageClient posts={posts} />;
+  const [posts, testimonials] = await Promise.all([getLatestPosts(), getTestimonials()]);
+  return <HomePageClient posts={posts} testimonials={testimonials} />;
 }

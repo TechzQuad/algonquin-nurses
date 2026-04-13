@@ -3,7 +3,13 @@
 import { motion } from "framer-motion";
 import { Quote } from "lucide-react";
 
-const testimonials = [
+export type TestimonialItem = {
+  name: string;
+  text: string;
+  location?: string;
+};
+
+const fallback: TestimonialItem[] = [
   {
     name: "Geraldine C.",
     text: "If it were not for my Aide at Algonquin Nurses I would not be able to move into a newly remodeled apartment.",
@@ -22,12 +28,13 @@ const testimonials = [
   },
 ];
 
-export function Testimonials() {
+export function Testimonials({ items }: { items?: TestimonialItem[] }) {
+  const list = items && items.length > 0 ? items : fallback;
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-      {testimonials.map((testimonial, index) => (
+      {list.map((testimonial, index) => (
         <motion.div
-          key={testimonial.name}
+          key={`${testimonial.name}-${index}`}
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
@@ -46,7 +53,9 @@ export function Testimonials() {
             </div>
             <div>
               <p className="font-semibold text-neutral-900">{testimonial.name}</p>
-              <p className="text-sm text-neutral-500">Client</p>
+              <p className="text-sm text-neutral-500">
+                {testimonial.location || "Client"}
+              </p>
             </div>
           </div>
         </motion.div>
