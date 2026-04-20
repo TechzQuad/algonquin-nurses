@@ -36,7 +36,7 @@ export const Applications: CollectionConfig = {
       relationTo: "application-forms",
       admin: {
         components: {
-          Cell: "../components/admin/ApplicationFormCell",
+          Cell: "./components/admin/ApplicationFormCell",
         },
       },
     },
