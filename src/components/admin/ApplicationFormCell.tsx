@@ -8,19 +8,27 @@ type UploadDoc = {
 
 type Props = {
   cellData?: number | UploadDoc | null
+  rowData?: Record<string, unknown>
 }
 
-export default function ApplicationFormCell({ cellData }: Props) {
-  if (!cellData || typeof cellData === 'number') {
-    return <span style={{ color: '#6b7280' }}>—</span>
-  }
+function resolveDoc(cellData: Props['cellData'], rowData: Props['rowData']): UploadDoc | null {
+  const value = (cellData && typeof cellData === 'object') ? cellData
+    : (rowData?.applicationForm && typeof rowData.applicationForm === 'object') ? rowData.applicationForm as UploadDoc
+    : null
 
-  const doc = cellData as UploadDoc
-  if (!doc.url) return <span style={{ color: '#6b7280' }}>—</span>
+  if (!value || typeof value !== 'object') return null
+  const doc = value as UploadDoc
+  return doc.url ? doc : null
+}
+
+export default function ApplicationFormCell({ cellData, rowData }: Props) {
+  const doc = resolveDoc(cellData, rowData)
+
+  if (!doc) return <span style={{ color: '#6b7280' }}>—</span>
 
   return (
     <a
-      href={doc.url}
+      href={doc.url!}
       target="_blank"
       rel="noopener noreferrer"
       onClick={(e) => e.stopPropagation()}
