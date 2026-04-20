@@ -34,6 +34,11 @@ export const Applications: CollectionConfig = {
       name: "applicationForm",
       type: "upload",
       relationTo: "application-forms",
+      admin: {
+        components: {
+          Cell: "@/components/admin/ApplicationFormCell",
+        },
+      },
     },
   ],
 };
