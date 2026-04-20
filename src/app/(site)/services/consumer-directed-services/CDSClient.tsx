@@ -72,7 +72,7 @@ export function CDSClient() {
         {
           question: "How do I get started with CDS?",
           answer:
-            "Contact us at (636) 274-1870 or visit our contact page. We'll guide you through the eligibility process and help you enroll in the CDS program.",
+            "Just call 636-274-1870 to get started with Consumer Directed Programs",
         },
       ]}
       ctaTitle="Start Directing Your Own Care"

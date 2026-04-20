@@ -53,7 +53,6 @@ export function VeteransCareClient() {
         "Personal Assistance (Bathing, Dressing, Ambulation)",
         "Medication Management & Reminders",
         "Companionship Support",
-        "Transportation Services",
         "Shopping & Errands",
         "Housekeeping",
         "Meal Preparation",

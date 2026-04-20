@@ -50,7 +50,7 @@ export function MedicaidClient() {
         {
           question: "Can my aide transport me to appointments?",
           answer:
-            "Missouri regulations prohibit nurse aides from transporting clients. In-Home Services tasks must be performed in the home. However, private-pay transportation options may be available separately.",
+            "Yes they can if they are under a Consumer Directed Program (CDS) ",
         },
         {
           question: "Can an aide stay overnight at my home?",

@@ -18,7 +18,6 @@ export function YouthProgramClient() {
         "Private Duty Nursing",
         "Advanced Personal Care",
         "Personal Care Aide Services",
-        "Skilled Nurse Visits",
         "Authorized Registered Nurse Visits",
         "Administrative Case Management",
         "Service Coordination",
@@ -39,7 +38,7 @@ export function YouthProgramClient() {
         {
           question: "What types of nursing care are available?",
           answer:
-            "We provide private duty nursing, skilled nurse visits, authorized RN visits, advanced personal care, and personal care aide services — all tailored to your child's specific medical needs.",
+            "Just call 636-274-1870 to get started. We provide private duty nursing, skilled nurse visits, authorized RN visits, advanced personal care, and personal care aide services — all tailored to your child's specific medical needs.",
         },
         {
           question: "How does service coordination work?",
