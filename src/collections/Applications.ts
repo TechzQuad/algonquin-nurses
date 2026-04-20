@@ -5,7 +5,7 @@ export const Applications: CollectionConfig = {
   labels: { singular: "Caregiver Application", plural: "Caregiver Applications" },
   admin: {
     useAsTitle: "email",
-    defaultColumns: ["firstName", "lastName", "email", "position", "createdAt"],
+    defaultColumns: ["firstName", "lastName", "email", "position", "applicationForm", "createdAt"],
     group: "Submissions",
   },
   access: {
