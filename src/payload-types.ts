@@ -77,7 +77,7 @@ export interface Config {
     referrals: Referral;
     feedback: Feedback;
     applications: Application;
-    resumes: Resume;
+    'application-forms': ApplicationForm;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -95,7 +95,7 @@ export interface Config {
     referrals: ReferralsSelect<false> | ReferralsSelect<true>;
     feedback: FeedbackSelect<false> | FeedbackSelect<true>;
     applications: ApplicationsSelect<false> | ApplicationsSelect<true>;
-    resumes: ResumesSelect<false> | ResumesSelect<true>;
+    'application-forms': ApplicationFormsSelect<false> | ApplicationFormsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -375,15 +375,15 @@ export interface Application {
   email: string;
   phone: string;
   position?: ('cna' | 'hha' | 'rn' | 'lpn' | 'other') | null;
-  resume?: (number | null) | Resume;
+  applicationForm?: (number | null) | ApplicationForm;
   updatedAt: string;
   createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "resumes".
+ * via the `definition` "application-forms".
  */
-export interface Resume {
+export interface ApplicationForm {
   id: number;
   updatedAt: string;
   createdAt: string;
@@ -698,15 +698,15 @@ export interface ApplicationsSelect<T extends boolean = true> {
   email?: T;
   phone?: T;
   position?: T;
-  resume?: T;
+  applicationForm?: T;
   updatedAt?: T;
   createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "resumes_select".
+ * via the `definition` "application-forms_select".
  */
-export interface ResumesSelect<T extends boolean = true> {
+export interface ApplicationFormsSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   url?: T;

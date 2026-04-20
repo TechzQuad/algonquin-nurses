@@ -16,7 +16,7 @@ export async function POST(request: Request) {
   const email = formData.get("email");
   const phone = formData.get("phone");
   const position = formData.get("position");
-  const resumeFile = formData.get("resume");
+  const applicationFile = formData.get("resume");
 
   if (!firstName || !lastName || !email || !phone) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -25,27 +25,29 @@ export async function POST(request: Request) {
   try {
     const payload = await getPayloadClient();
 
-    let resumeId: number | undefined;
+    let applicationFormId: number | undefined;
 
-    if (resumeFile instanceof File && resumeFile.size > 0) {
-      const arrayBuffer = await resumeFile.arrayBuffer();
+    if (applicationFile instanceof File && applicationFile.size > 0) {
+      const arrayBuffer = await applicationFile.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
 
       const uploaded = await payload.create({
-        collection: "resumes",
+        collection: "application-forms",
+        overrideAccess: true,
         data: {} as never,
         file: {
           data: buffer,
           mimetype: "application/pdf",
-          name: resumeFile.name,
+          name: applicationFile.name,
           size: buffer.length,
         },
       });
-      resumeId = uploaded.id as number;
+      applicationFormId = uploaded.id as number;
     }
 
     await payload.create({
       collection: "applications",
+      overrideAccess: true,
       data: {
         firstName: String(firstName),
         lastName: String(lastName),
@@ -53,7 +55,7 @@ export async function POST(request: Request) {
         phone: String(phone),
         position: (position ? String(position) : undefined) as
           | "cna" | "hha" | "rn" | "lpn" | "other" | undefined,
-        resume: resumeId,
+        applicationForm: applicationFormId,
       },
     });
 

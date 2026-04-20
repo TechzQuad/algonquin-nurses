@@ -31,9 +31,9 @@ export const Applications: CollectionConfig = {
       ],
     },
     {
-      name: "resume",
+      name: "applicationForm",
       type: "upload",
-      relationTo: "resumes",
+      relationTo: "application-forms",
     },
   ],
 };

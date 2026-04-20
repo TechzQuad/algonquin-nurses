@@ -1,8 +1,8 @@
 import type { CollectionConfig } from "payload";
 
 export const Resumes: CollectionConfig = {
-  slug: "resumes",
-  labels: { singular: "Resume", plural: "Resumes" },
+  slug: "application-forms",
+  labels: { singular: "Application Form", plural: "Application Forms" },
   admin: {
     group: "Submissions",
     defaultColumns: ["filename", "createdAt"],
@@ -14,7 +14,7 @@ export const Resumes: CollectionConfig = {
     delete: ({ req }) => Boolean(req.user),
   },
   upload: {
-    staticDir: "resumes",
+    staticDir: "application-forms",
     mimeTypes: ["application/pdf"],
   },
   fields: [],
