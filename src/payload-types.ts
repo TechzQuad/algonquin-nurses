@@ -460,6 +460,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'applications';
         value: number | Application;
+      } | null)
+    | ({
+        relationTo: 'application-forms';
+        value: number | ApplicationForm;
       } | null);
   globalSlug?: string | null;
   user: {
