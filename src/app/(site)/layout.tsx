@@ -39,6 +39,11 @@ export const metadata: Metadata = {
     locale: "en_US",
     siteName: "Algonquin Nurses Home Health",
   },
+  icons: {
+    icon: "/images/favicon.png",
+    shortcut: "/images/favicon.png",
+    apple: "/images/favicon.png",
+  },
   robots: {
     index: true,
     follow: true,

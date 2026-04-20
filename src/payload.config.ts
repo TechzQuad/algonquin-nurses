@@ -16,6 +16,7 @@ import { ContactSubmissions } from "./collections/ContactSubmissions.ts";
 import { Referrals } from "./collections/Referrals.ts";
 import { Feedback } from "./collections/Feedback.ts";
 import { Applications } from "./collections/Applications.ts";
+import { Resumes } from "./collections/Resumes.ts";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -38,6 +39,7 @@ export default buildConfig({
     Referrals,
     Feedback,
     Applications,
+    Resumes,
   ],
   editor: lexicalEditor({}),
   secret: process.env.PAYLOAD_SECRET || "",
@@ -52,7 +54,7 @@ export default buildConfig({
   plugins: [
     vercelBlobStorage({
       enabled: Boolean(process.env.BLOB_READ_WRITE_TOKEN),
-      collections: { media: true },
+      collections: { media: true, resumes: true } as Record<string, true>,
       token: process.env.BLOB_READ_WRITE_TOKEN || "",
     }),
   ],

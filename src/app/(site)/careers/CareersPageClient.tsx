@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { motion } from "framer-motion";
-import { Heart, Clock, MapPin, Shield, Users, Award, Send, Briefcase } from "lucide-react";
+import { Heart, Clock, MapPin, Shield, Users, Award, Send, Briefcase, Upload, FileText, Download } from "lucide-react";
 import { Hero } from "@/components/Hero";
 import { SectionHeading } from "@/components/SectionHeading";
 import { CTASection } from "@/components/CTASection";
@@ -47,18 +47,23 @@ export function CareersPageClient() {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [resumeFile, setResumeFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] ?? null;
+    setResumeFile(file);
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSubmitting(true);
     setError(null);
     const formData = new FormData(e.currentTarget);
-    const payload = Object.fromEntries(formData.entries());
     try {
       const res = await fetch("/api/applications", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: formData,
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
@@ -215,8 +220,36 @@ export function CareersPageClient() {
                 </select>
               </div>
               <div>
-                <label htmlFor="appExperience" className="block text-sm font-medium text-neutral-700 mb-1.5">Experience & Qualifications</label>
-                <textarea id="appExperience" name="experience" rows={4} className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors resize-none" placeholder="Tell us about your experience and certifications..." />
+                <label className="block text-sm font-medium text-neutral-700 mb-1.5">
+                  Completed Application Form <span className="text-neutral-400 font-normal">(PDF only)</span>
+                </label>
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  className="w-full border-2 border-dashed border-neutral-200 rounded-lg px-5 py-8 flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition-colors"
+                >
+                  {resumeFile ? (
+                    <>
+                      <FileText className="w-8 h-8 text-primary" />
+                      <p className="text-sm font-medium text-neutral-800">{resumeFile.name}</p>
+                      <p className="text-xs text-neutral-400">{(resumeFile.size / 1024).toFixed(0)} KB — click to change</p>
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="w-8 h-8 text-neutral-400" />
+                      <p className="text-sm font-medium text-neutral-700">Upload your completed application form</p>
+                      <p className="text-xs text-neutral-400">PDF files only — download the form below, fill it out, then upload here</p>
+                    </>
+                  )}
+                </div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  id="appResume"
+                  name="resume"
+                  accept="application/pdf"
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
               </div>
               {error && <p className="text-sm text-red-600">{error}</p>}
               <button type="submit" disabled={submitting} className="w-full sm:w-auto px-8 py-3.5 bg-accent hover:bg-accent-light text-white font-semibold rounded-lg transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed">
@@ -225,6 +258,31 @@ export function CareersPageClient() {
               </button>
             </form>
           )}
+
+          {/* Employment application download */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4 }}
+            className="mt-10 bg-surface border border-neutral-100 rounded-2xl px-8 py-7 flex flex-col sm:flex-row sm:items-center gap-5"
+          >
+            <div className="flex-1">
+              <p className="font-semibold text-neutral-900 mb-1">Need a printable application?</p>
+              <p className="text-sm text-neutral-600 leading-relaxed">
+                Download our official Employment Application Form, fill it out, and bring or mail it to our office. You may also scan and attach the completed form above when submitting online.
+              </p>
+            </div>
+            <a
+              href="/pdf/Employment_Form.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary hover:bg-primary-dark text-white font-semibold text-sm rounded-lg transition-colors shadow-sm hover:shadow-md flex-shrink-0"
+            >
+              <Download className="w-4 h-4" />
+              Download Application
+            </a>
+          </motion.div>
         </div>
       </section>
     </>

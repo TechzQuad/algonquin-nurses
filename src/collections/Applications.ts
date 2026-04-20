@@ -30,6 +30,10 @@ export const Applications: CollectionConfig = {
         { label: "Other", value: "other" },
       ],
     },
-    { name: "experience", type: "textarea" },
+    {
+      name: "resume",
+      type: "upload",
+      relationTo: "resumes",
+    },
   ],
 };
