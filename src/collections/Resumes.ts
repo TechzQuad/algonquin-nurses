@@ -6,6 +6,7 @@ export const Resumes: CollectionConfig = {
   admin: {
     group: "Submissions",
     defaultColumns: ["filename", "createdAt"],
+    hidden: true,
   },
   access: {
     read: ({ req }) => Boolean(req.user),
