@@ -77,6 +77,7 @@ export interface Config {
     referrals: Referral;
     feedback: Feedback;
     applications: Application;
+    resumes: Resume;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -94,6 +95,7 @@ export interface Config {
     referrals: ReferralsSelect<false> | ReferralsSelect<true>;
     feedback: FeedbackSelect<false> | FeedbackSelect<true>;
     applications: ApplicationsSelect<false> | ApplicationsSelect<true>;
+    resumes: ResumesSelect<false> | ResumesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -373,9 +375,27 @@ export interface Application {
   email: string;
   phone: string;
   position?: ('cna' | 'hha' | 'rn' | 'lpn' | 'other') | null;
-  experience?: string | null;
+  resume?: (number | null) | Resume;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "resumes".
+ */
+export interface Resume {
+  id: number;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -678,9 +698,26 @@ export interface ApplicationsSelect<T extends boolean = true> {
   email?: T;
   phone?: T;
   position?: T;
-  experience?: T;
+  resume?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "resumes_select".
+ */
+export interface ResumesSelect<T extends boolean = true> {
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
