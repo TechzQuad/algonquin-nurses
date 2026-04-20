@@ -1,37 +1,39 @@
-'use client'
-
-type UploadDoc = {
-  id: number
-  url?: string | null
-  filename?: string | null
-}
+import type { Payload } from 'payload'
 
 type Props = {
-  cellData?: number | UploadDoc | null
+  cellData?: number | { id: number; url?: string | null } | null
   rowData?: Record<string, unknown>
+  payload?: Payload
 }
 
-function resolveDoc(cellData: Props['cellData'], rowData: Props['rowData']): UploadDoc | null {
-  const value = (cellData && typeof cellData === 'object') ? cellData
-    : (rowData?.applicationForm && typeof rowData.applicationForm === 'object') ? rowData.applicationForm as UploadDoc
+export default async function ApplicationFormCell({ cellData, rowData, payload }: Props) {
+  const formId =
+    typeof cellData === 'number' ? cellData
+    : cellData && typeof cellData === 'object' ? cellData.id
+    : typeof rowData?.applicationForm === 'number' ? (rowData.applicationForm as number)
     : null
 
-  if (!value || typeof value !== 'object') return null
-  const doc = value as UploadDoc
-  return doc.url ? doc : null
-}
+  if (!formId || !payload) return <span style={{ color: '#6b7280' }}>—</span>
 
-export default function ApplicationFormCell({ cellData, rowData }: Props) {
-  const doc = resolveDoc(cellData, rowData)
+  let url: string | null = null
+  try {
+    const form = await payload.findByID({
+      collection: 'application-forms',
+      id: formId,
+      overrideAccess: true,
+    })
+    url = (form as { url?: string | null })?.url ?? null
+  } catch {
+    return <span style={{ color: '#6b7280' }}>—</span>
+  }
 
-  if (!doc) return <span style={{ color: '#6b7280' }}>—</span>
+  if (!url) return <span style={{ color: '#6b7280' }}>—</span>
 
   return (
     <a
-      href={doc.url!}
+      href={url}
       target="_blank"
       rel="noopener noreferrer"
-      onClick={(e) => e.stopPropagation()}
       style={{
         display: 'inline-flex',
         alignItems: 'center',
