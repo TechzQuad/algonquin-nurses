@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { Heart, Target, Shield, Users, Award, HandHeart, CheckCircle2, Home, GraduationCap, HeartHandshake } from "lucide-react";
 import { Hero } from "@/components/Hero";
@@ -70,10 +71,29 @@ export function AboutPageClient() {
         compact
       />
 
-      {/* Mission */}
+      {/* Company Background */}
       <section className="py-20 lg:py-28 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="max-w-3xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+            {/* Founder image */}
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="relative w-full aspect-[4/5] rounded-3xl overflow-hidden shadow-xl order-last lg:order-first"
+            >
+              <Image
+                src="/images/founder.jpeg"
+                alt="Steve Tamboli, founder of Algonquin Nurses Home Health Care"
+                fill
+                className="object-cover object-center"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                priority
+              />
+            </motion.div>
+
+            {/* Copy */}
             <motion.div
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -81,21 +101,32 @@ export function AboutPageClient() {
               transition={{ duration: 0.5, delay: 0.1 }}
             >
               <SectionHeading
-                label="Our Mission"
-                title="Delivering Excellence in Home Health Care"
-                center
+                label="Our Story"
+                title="Company Background"
               />
-              <blockquote className="border-l-4 border-primary pl-5 mb-8 text-center">
-                <p className="text-lg text-neutral-700 italic leading-relaxed">
-                  &ldquo;To provide for the effective and efficient delivery of health care and health-related services in areas of identifiable need, for the benefit of individuals, family, and society.&rdquo;
+              <div className="space-y-5 text-neutral-600 leading-relaxed">
+                <p>
+                  Steve and Mary Tamboli started Algonquin Nurses Home Health Care in 1987. The company was named after one of the most prestigious hotels in New York, known for its lofty standards.
                 </p>
-              </blockquote>
-              <p className="text-neutral-600 leading-relaxed mb-6 text-center">
-                Steve and Mary Tamboli started Algonquin Nurses Home Health Care in 1987, naming the company after one of the most prestigious hotels in New York — known for its lofty standards. The company began by staffing nursing homes and hospitals, then expanded into home care.
-              </p>
-              <p className="text-neutral-600 leading-relaxed text-center">
-                Mary has since retired, and Steve runs the company while remaining active in our community. He is highly involved in his family&apos;s Brenden Friday Backpack program, which provides meals for school children across the St. Louis area.
-              </p>
+                <p>
+                  Mary has since retired, and Steve runs the company while also remaining active in the community. He is highly active in his family&apos;s Brenden Friday Backpack program, which provides meals for school children.
+                </p>
+                <p>
+                  First, Algonquin Nurses started staffing nursing homes and hospitals and then expanded into Home Care.
+                </p>
+                <p>
+                  Our first goal here at Algonquin Nurses is to help elderly and disabled individuals stay in their home as long as they can. We pride ourselves on the quality of care our staff bring to your home.
+                </p>
+                <p>
+                  We take pride in knowing that our staff help families with their loved ones&apos; safety and care in their homes.
+                </p>
+                <p>
+                  Our team has a comprehensive skill set and is well equipped to manage all responsibilities effectively in one&apos;s home. The important level of training and professionalism demonstrated by the team is commendable.
+                </p>
+                <p>
+                  Our team works in coordination with hospice providers to support patients and their families by offering specialized services.
+                </p>
+              </div>
             </motion.div>
           </div>
         </div>
