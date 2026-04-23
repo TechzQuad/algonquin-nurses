@@ -1,85 +1,103 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 export function CookieBanner() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     if (!localStorage.getItem("cookie-consent")) {
-      setVisible(true);
+      const timer = setTimeout(() => setVisible(true), 800);
+      return () => clearTimeout(timer);
     }
   }, []);
 
-  function accept() {
+  function handleAccept() {
     localStorage.setItem("cookie-consent", "accepted");
+    setVisible(false);
+  }
+
+  function handleDecline() {
+    localStorage.setItem("cookie-consent", "declined");
     setVisible(false);
   }
 
   if (!visible) return null;
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        bottom: "24px",
-        left: "50%",
-        transform: "translateX(-50%)",
-        zIndex: 9999,
-        width: "min(640px, calc(100vw - 32px))",
-        animation: "slideUp 0.4s ease",
-      }}
-    >
+    <>
       <style>{`
-        @keyframes slideUp {
-          from { opacity: 0; transform: translateX(-50%) translateY(24px); }
+        @keyframes cookieSlideUp {
+          from { opacity: 0; transform: translateX(-50%) translateY(16px); }
           to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+        .cookie-banner {
+          animation: cookieSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
       `}</style>
 
-      <div className="rounded-2xl bg-white shadow-2xl border border-gray-100 p-5 flex flex-col gap-4">
-        <div className="flex items-start gap-3">
-          <span className="text-2xl shrink-0">🍪</span>
-          <div>
-            <p className="text-sm font-semibold text-gray-900 mb-1">
-              We use cookies &amp; respect your privacy
-            </p>
-            <p className="text-xs text-gray-500 leading-relaxed">
-              We use cookies to improve your browsing experience and analyze site
-              traffic. By continuing to use this site you agree to our{" "}
-              <a
-                href="/privacy-policy"
-                className="underline text-blue-600 hover:text-blue-800"
+      <div
+        className="cookie-banner"
+        style={{
+          position: "fixed",
+          bottom: "28px",
+          left: "50%",
+          transform: "translateX(-50%)",
+          zIndex: 9999,
+          width: "min(680px, calc(100vw - 32px))",
+        }}
+      >
+        <div
+          style={{ backgroundColor: "#2d4a78" }}
+          className="rounded-xl shadow-2xl overflow-hidden"
+        >
+          {/* accent top bar */}
+          <div style={{ height: "3px", backgroundColor: "#0d9488" }} />
+
+          <div className="px-6 py-5 flex flex-col sm:flex-row sm:items-center gap-4">
+            <div className="flex-1 min-w-0">
+              <p className="text-white text-sm font-semibold mb-1 tracking-wide">
+                Privacy &amp; Cookie Notice
+              </p>
+              <p className="text-white/70 text-xs leading-relaxed">
+                We use cookies to enhance your experience and analyze site usage.
+                By continuing, you agree to our{" "}
+                <Link
+                  href="/privacy"
+                  className="text-[#14b8a6] hover:text-white underline underline-offset-2 transition-colors"
+                >
+                  Privacy Policy
+                </Link>{" "}
+                and{" "}
+                <Link
+                  href="/cookie-policy"
+                  className="text-[#14b8a6] hover:text-white underline underline-offset-2 transition-colors"
+                >
+                  Cookie Policy
+                </Link>
+                .
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                onClick={handleDecline}
+                className="px-4 py-2 text-xs font-medium text-white/60 hover:text-white border border-white/20 hover:border-white/40 rounded-lg transition-all"
               >
-                Privacy Policy
-              </a>{" "}
-              and{" "}
-              <a
-                href="/cookie-policy"
-                className="underline text-blue-600 hover:text-blue-800"
+                Decline
+              </button>
+              <button
+                onClick={handleAccept}
+                style={{ backgroundColor: "#0d9488" }}
+                className="px-5 py-2 text-xs font-semibold text-white rounded-lg hover:opacity-90 transition-opacity"
               >
-                Cookie Policy
-              </a>
-              .
-            </p>
+                Accept All
+              </button>
+            </div>
           </div>
         </div>
-
-        <div className="flex gap-2 justify-end">
-          <button
-            onClick={accept}
-            className="text-xs px-4 py-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
-          >
-            Decline
-          </button>
-          <button
-            onClick={accept}
-            className="text-xs px-5 py-2 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors"
-          >
-            Accept All
-          </button>
-        </div>
       </div>
-    </div>
+    </>
   );
 }
