@@ -45,7 +45,7 @@ export function CookieBanner() {
           left: "50%",
           transform: "translateX(-50%)",
           zIndex: 9999,
-          width: "min(680px, calc(100vw - 32px))",
+          width: "min(780px, calc(100vw - 32px))",
         }}
       >
         <div
@@ -55,12 +55,12 @@ export function CookieBanner() {
           {/* accent top bar */}
           <div style={{ height: "3px", backgroundColor: "#0d9488" }} />
 
-          <div className="px-6 py-5 flex flex-col sm:flex-row sm:items-center gap-4">
+          <div className="px-7 py-6 flex flex-col sm:flex-row sm:items-center gap-5">
             <div className="flex-1 min-w-0">
-              <p className="text-white text-sm font-semibold mb-1 tracking-wide">
+              <p className="text-white text-base font-semibold mb-1.5 tracking-wide">
                 Privacy &amp; Cookie Notice
               </p>
-              <p className="text-white/70 text-xs leading-relaxed">
+              <p className="text-white/70 text-sm leading-relaxed">
                 We use cookies to enhance your experience and analyze site usage.
                 By continuing, you agree to our{" "}
                 <Link
@@ -83,14 +83,14 @@ export function CookieBanner() {
             <div className="flex items-center gap-2 shrink-0">
               <button
                 onClick={handleDecline}
-                className="px-4 py-2 text-xs font-medium text-white/60 hover:text-white border border-white/20 hover:border-white/40 rounded-lg transition-all"
+                className="px-5 py-2.5 text-sm font-medium text-white/60 hover:text-white border border-white/20 hover:border-white/40 rounded-lg transition-all"
               >
                 Decline
               </button>
               <button
                 onClick={handleAccept}
                 style={{ backgroundColor: "#0d9488" }}
-                className="px-5 py-2 text-xs font-semibold text-white rounded-lg hover:opacity-90 transition-opacity"
+                className="px-6 py-2.5 text-sm font-semibold text-white rounded-lg hover:opacity-90 transition-opacity"
               >
                 Accept All
               </button>
