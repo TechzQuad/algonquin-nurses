@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { X, Send } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -132,11 +133,20 @@ export function ChatWidget() {
   const [lead, setLead] = useState({ name: "", email: "", phone: "" });
   const [input, setInput] = useState("");
   const [saving, setSaving] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, open]);
+
+  // Show tooltip bubble briefly after button enters, dismiss when chat opens
+  useEffect(() => {
+    if (open) { setShowTooltip(false); return; }
+    const show = setTimeout(() => setShowTooltip(true), 2200);
+    const hide = setTimeout(() => setShowTooltip(false), 6500);
+    return () => { clearTimeout(show); clearTimeout(hide); };
+  }, [open]);
 
   function bot(text: string, links?: { label: string; href: string }[]) {
     setMessages((prev) => [...prev, { role: "bot", text, links }]);
@@ -321,26 +331,57 @@ export function ChatWidget() {
   return (
     <>
       {/* Toggle button — bottom left */}
-      {!open && (
-        <div className="fixed bottom-6 left-6 z-50">
-          {/* Attention pulse ring */}
-          <span className="absolute inset-0 rounded-full bg-accent animate-chat-ring pointer-events-none" />
-          <button
-            onClick={() => setOpen(true)}
-            className="relative bg-accent hover:bg-accent-dark text-white rounded-full shadow-xl transition-all hover:scale-105 flex items-center gap-2 pl-3.5 pr-5 py-3"
-            aria-label="Open chat"
+      <AnimatePresence>
+        {!open && (
+          <motion.div
+            className="fixed bottom-6 left-6 z-50"
+            initial={{ y: 80, opacity: 0, scale: 0.8 }}
+            animate={{ y: 0, opacity: 1, scale: 1 }}
+            exit={{ y: 24, opacity: 0, scale: 0.9 }}
+            transition={{ type: "spring", stiffness: 320, damping: 22, delay: 0.8 }}
           >
-            <span className="animate-wave-hand text-xl leading-none select-none">👋</span>
-            <span className="text-sm font-semibold leading-none">Chat with Us!</span>
-          </button>
-        </div>
-      )}
+            {/* Tooltip bubble */}
+            <AnimatePresence>
+              {showTooltip && (
+                <motion.div
+                  initial={{ opacity: 0, y: 6, scale: 0.92 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 6, scale: 0.92 }}
+                  transition={{ duration: 0.22 }}
+                  className="absolute bottom-full left-0 mb-3 bg-white rounded-2xl shadow-xl border border-neutral-100 px-4 py-2.5 whitespace-nowrap pointer-events-none"
+                >
+                  <p className="text-sm font-semibold text-neutral-800">We&apos;re here to help! 💬</p>
+                  <p className="text-xs text-neutral-500 mt-0.5">Ask us anything, anytime.</p>
+                  {/* Arrow */}
+                  <span className="absolute -bottom-[5px] left-5 w-2.5 h-2.5 bg-white border-r border-b border-neutral-100 rotate-45" />
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Attention pulse ring */}
+            <span className="absolute inset-0 rounded-full bg-accent animate-chat-ring pointer-events-none" />
+            <button
+              onClick={() => setOpen(true)}
+              className="relative bg-accent hover:bg-accent-dark text-white rounded-full shadow-xl transition-all hover:scale-105 flex items-center gap-2 pl-3.5 pr-5 py-3"
+              aria-label="Open chat"
+            >
+              <span className="animate-wave-hand text-xl leading-none select-none">👋</span>
+              <span className="text-sm font-semibold leading-none">Chat with Us!</span>
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Chat panel — bottom left */}
-      {open && (
-        <div
+      <AnimatePresence>
+        {open && (
+        <motion.div
           className="fixed bottom-6 left-6 z-50 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-neutral-200"
-          style={{ maxHeight: "min(560px, calc(100vh - 48px))" }}
+          style={{ maxHeight: "min(560px, calc(100vh - 48px))", transformOrigin: "bottom left" }}
+          initial={{ opacity: 0, scale: 0.88, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.88, y: 20 }}
+          transition={{ type: "spring", stiffness: 380, damping: 26 }}
         >
           {/* Header */}
           <div className="bg-accent text-white px-4 py-3 flex items-center justify-between flex-shrink-0">
@@ -454,8 +495,9 @@ export function ChatWidget() {
               </button>
             </form>
           )}
-        </div>
-      )}
+        </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }
