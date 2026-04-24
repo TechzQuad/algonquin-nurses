@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { MessageCircle, X, Send } from "lucide-react";
+import { X, Send } from "lucide-react";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -322,14 +322,18 @@ export function ChatWidget() {
     <>
       {/* Toggle button — bottom left */}
       {!open && (
-        <button
-          onClick={() => setOpen(true)}
-          className="fixed bottom-6 left-6 z-50 bg-primary hover:bg-primary-dark text-white rounded-full shadow-lg transition-all hover:scale-105 flex items-center gap-2.5 pl-4 pr-5 py-3"
-          aria-label="Open chat"
-        >
-          <MessageCircle className="w-5 h-5 flex-shrink-0" />
-          <span className="text-sm font-semibold leading-none">Chat with Us</span>
-        </button>
+        <div className="fixed bottom-6 left-6 z-50">
+          {/* Attention pulse ring */}
+          <span className="absolute inset-0 rounded-full bg-chat animate-chat-ring pointer-events-none" />
+          <button
+            onClick={() => setOpen(true)}
+            className="relative bg-chat hover:bg-chat-dark text-white rounded-full shadow-xl transition-all hover:scale-105 flex items-center gap-2 pl-3.5 pr-5 py-3"
+            aria-label="Open chat"
+          >
+            <span className="animate-wave-hand text-xl leading-none select-none">👋</span>
+            <span className="text-sm font-semibold leading-none">Chat with Us!</span>
+          </button>
+        </div>
       )}
 
       {/* Chat panel — bottom left */}
@@ -339,10 +343,10 @@ export function ChatWidget() {
           style={{ maxHeight: "min(560px, calc(100vh - 48px))" }}
         >
           {/* Header */}
-          <div className="bg-primary text-white px-4 py-3 flex items-center justify-between flex-shrink-0">
+          <div className="bg-chat text-white px-4 py-3 flex items-center justify-between flex-shrink-0">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-                <MessageCircle className="w-4 h-4" />
+              <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 text-lg leading-none select-none">
+                👋
               </div>
               <div>
                 <p className="font-semibold text-sm leading-tight">Algonquin Nurses</p>
@@ -359,8 +363,8 @@ export function ChatWidget() {
           </div>
 
           {/* Welcome banner */}
-          <div className="bg-primary/8 px-4 py-2 border-b border-primary/15 flex-shrink-0">
-            <p className="text-xs text-primary font-semibold text-center tracking-wide">
+          <div className="bg-chat/8 px-4 py-2 border-b border-chat/20 flex-shrink-0">
+            <p className="text-xs text-chat-dark font-semibold text-center tracking-wide">
               Welcome — How may we help you today?
             </p>
           </div>
@@ -373,7 +377,7 @@ export function ChatWidget() {
                   <div
                     className={`px-3.5 py-2.5 rounded-2xl text-sm whitespace-pre-line leading-relaxed ${
                       msg.role === "user"
-                        ? "bg-primary text-white rounded-br-sm"
+                        ? "bg-chat text-white rounded-br-sm"
                         : "bg-white text-neutral-800 border border-neutral-200 rounded-bl-sm shadow-sm"
                     }`}
                   >
@@ -383,7 +387,7 @@ export function ChatWidget() {
                     <a
                       key={link.href}
                       href={link.href}
-                      className="block text-center text-xs font-semibold text-primary border-2 border-primary rounded-xl px-3 py-2 hover:bg-primary hover:text-white transition-colors"
+                      className="block text-center text-xs font-semibold text-chat border-2 border-chat rounded-xl px-3 py-2 hover:bg-chat hover:text-white transition-colors"
                     >
                       {link.label}
                     </a>
@@ -399,7 +403,7 @@ export function ChatWidget() {
                   <button
                     key={q}
                     onClick={() => handleQuickReply(q)}
-                    className="text-xs px-3 py-1.5 rounded-full border border-primary/30 text-primary bg-white hover:bg-primary hover:text-white transition-colors font-medium"
+                    className="text-xs px-3 py-1.5 rounded-full border border-chat/30 text-chat bg-white hover:bg-chat hover:text-white transition-colors font-medium"
                   >
                     {q}
                   </button>
@@ -412,9 +416,9 @@ export function ChatWidget() {
               <div className="flex justify-start">
                 <div className="bg-white border border-neutral-200 rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm">
                   <div className="flex gap-1 items-center h-3">
-                    <span className="w-1.5 h-1.5 bg-primary/60 rounded-full animate-bounce [animation-delay:0ms]" />
-                    <span className="w-1.5 h-1.5 bg-primary/60 rounded-full animate-bounce [animation-delay:150ms]" />
-                    <span className="w-1.5 h-1.5 bg-primary/60 rounded-full animate-bounce [animation-delay:300ms]" />
+                    <span className="w-1.5 h-1.5 bg-chat/60 rounded-full animate-bounce [animation-delay:0ms]" />
+                    <span className="w-1.5 h-1.5 bg-chat/60 rounded-full animate-bounce [animation-delay:150ms]" />
+                    <span className="w-1.5 h-1.5 bg-chat/60 rounded-full animate-bounce [animation-delay:300ms]" />
                   </div>
                 </div>
               </div>
@@ -437,12 +441,12 @@ export function ChatWidget() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder={inputPlaceholder[phase] ?? "Type a message..."}
-                className="flex-1 text-sm px-3 py-2 rounded-xl border border-neutral-300 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
+                className="flex-1 text-sm px-3 py-2 rounded-xl border border-neutral-300 focus:outline-none focus:border-chat focus:ring-1 focus:ring-chat/20"
                 autoFocus
               />
               <button
                 type="submit"
-                className="bg-primary hover:bg-primary-dark text-white rounded-xl p-2.5 transition-colors disabled:opacity-40"
+                className="bg-chat hover:bg-chat-dark text-white rounded-xl p-2.5 transition-colors disabled:opacity-40"
                 disabled={!input.trim() || saving}
                 aria-label="Send"
               >
