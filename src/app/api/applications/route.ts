@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getPayloadClient } from "@/lib/payload";
+import { sendApplicationConfirmation } from "@/lib/email";
 
 export const runtime = "nodejs";
 
@@ -57,6 +58,14 @@ export async function POST(request: Request) {
           | "cna" | "hha" | "rn" | "lpn" | "other" | undefined,
         applicationForm: applicationFormId,
       },
+    });
+
+    await sendApplicationConfirmation({
+      email: String(email),
+      firstName: String(firstName),
+      lastName: String(lastName),
+      phone: String(phone),
+      position: position ? String(position) : undefined,
     });
 
     return NextResponse.json({ ok: true });

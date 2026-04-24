@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getPayloadClient } from "@/lib/payload";
-import { sendContactConfirmation } from "@/lib/email";
+import { sendChatLeadConfirmation } from "@/lib/email";
 
 export const runtime = "nodejs";
 
@@ -10,39 +10,36 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const { firstName, lastName, email, phone, service, message } = body as Record<string, unknown>;
+  const { name, email, phone, service } = body as Record<string, unknown>;
 
-  if (!firstName || !lastName || !email || !phone || !message) {
+  if (!name || !email || !phone) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
   }
 
   try {
     const payload = await getPayloadClient();
     await payload.create({
-      collection: "contact-submissions",
+      collection: "chat-leads",
+      overrideAccess: true,
       data: {
-        firstName: String(firstName),
-        lastName: String(lastName),
+        name: String(name),
         email: String(email),
         phone: String(phone),
         service: (service ? String(service) : undefined) as
-          | "private-duty" | "medicaid" | "cds" | "hcy" | "veterans" | "other" | undefined,
-        message: String(message),
+          | "private-duty" | "medicaid" | "cds" | "hcy" | "veterans" | undefined,
       },
     });
 
-    await sendContactConfirmation({
+    await sendChatLeadConfirmation({
       email: String(email),
-      firstName: String(firstName),
-      lastName: String(lastName),
+      name: String(name),
       phone: String(phone),
       service: service ? String(service) : undefined,
-      message: String(message),
     });
 
     return NextResponse.json({ ok: true });
   } catch (err) {
-    console.error("contact submission failed", err);
-    return NextResponse.json({ error: "Failed to submit" }, { status: 500 });
+    console.error("chat lead save failed", err);
+    return NextResponse.json({ error: "Failed to save" }, { status: 500 });
   }
 }

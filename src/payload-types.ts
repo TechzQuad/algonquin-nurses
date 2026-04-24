@@ -78,6 +78,7 @@ export interface Config {
     feedback: Feedback;
     applications: Application;
     'application-forms': ApplicationForm;
+    'chat-leads': ChatLead;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -96,6 +97,7 @@ export interface Config {
     feedback: FeedbackSelect<false> | FeedbackSelect<true>;
     applications: ApplicationsSelect<false> | ApplicationsSelect<true>;
     'application-forms': ApplicationFormsSelect<false> | ApplicationFormsSelect<true>;
+    'chat-leads': ChatLeadsSelect<false> | ChatLeadsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -399,6 +401,19 @@ export interface ApplicationForm {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "chat-leads".
+ */
+export interface ChatLead {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  service?: ('private-duty' | 'medicaid' | 'cds' | 'hcy' | 'veterans') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -464,6 +479,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'application-forms';
         value: number | ApplicationForm;
+      } | null)
+    | ({
+        relationTo: 'chat-leads';
+        value: number | ChatLead;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -722,6 +741,18 @@ export interface ApplicationFormsSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "chat-leads_select".
+ */
+export interface ChatLeadsSelect<T extends boolean = true> {
+  name?: T;
+  email?: T;
+  phone?: T;
+  service?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

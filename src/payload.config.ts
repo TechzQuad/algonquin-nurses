@@ -17,6 +17,7 @@ import { Referrals } from "./collections/Referrals.ts";
 import { Feedback } from "./collections/Feedback.ts";
 import { Applications } from "./collections/Applications.ts";
 import { Resumes } from "./collections/Resumes.ts";
+import { ChatLeads } from "./collections/ChatLeads.ts";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -40,6 +41,7 @@ export default buildConfig({
     Feedback,
     Applications,
     Resumes,
+    ChatLeads,
   ],
   editor: lexicalEditor({}),
   secret: process.env.PAYLOAD_SECRET || "",

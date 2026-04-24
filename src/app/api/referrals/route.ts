@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getPayloadClient } from "@/lib/payload";
+import { sendReferralConfirmation } from "@/lib/email";
 
 export const runtime = "nodejs";
 
@@ -9,7 +10,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const { referrerName, referrerPhone, clientName, clientPhone, service, notes } =
+  const { referrerName, referrerPhone, referrerEmail, clientName, clientPhone, service, notes } =
     body as Record<string, unknown>;
 
   if (!referrerName || !referrerPhone || !clientName) {
@@ -30,6 +31,17 @@ export async function POST(request: Request) {
         notes: notes ? String(notes) : undefined,
       },
     });
+
+    await sendReferralConfirmation({
+      referrerEmail: referrerEmail ? String(referrerEmail) : undefined,
+      referrerName: String(referrerName),
+      referrerPhone: String(referrerPhone),
+      clientName: String(clientName),
+      clientPhone: clientPhone ? String(clientPhone) : undefined,
+      service: service ? String(service) : undefined,
+      notes: notes ? String(notes) : undefined,
+    });
+
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error("referral submission failed", err);

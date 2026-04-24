@@ -5,6 +5,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { SchemaMarkup } from "@/components/SchemaMarkup";
 import { ChatWidget } from "@/components/ChatWidget";
+import { BackToTop } from "@/components/BackToTop";
 import { CookieBanner } from "@/components/CookieBanner";
 
 const inter = Inter({
@@ -66,6 +67,7 @@ export default function RootLayout({
         <main className="flex-1">{children}</main>
         <Footer />
         <ChatWidget />
+        <BackToTop />
         <CookieBanner />
       </body>
     </html>
