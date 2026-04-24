@@ -11,13 +11,14 @@ const services = [
   { name: "Private Duty Care", href: "/services/private-duty-care" },
   { name: "Medicaid In-Home Care", href: "/services/medicaid-in-home-care" },
   { name: "Consumer Directed Services", href: "/services/consumer-directed-services" },
-  { name: "Healthy Youth & Children Program", href: "/services/youth-programs" },
-  { name: "Private Duty Services for Veterans", href: "/services/veterans-care" },
+  { name: "Youth & Children Program", href: "/services/youth-programs" },
+  { name: "Veterans Care", href: "/services/veterans-care" },
 ];
 
 const aboutLinks = [
   { name: "About Us", href: "/about" },
-  { name: "Home Care Privacy Practices", href: "/about#privacy" },
+  { name: "Our Team", href: "/team" },
+  { name: "Feedback", href: "/feedback" },
 ];
 
 export function Navbar() {
@@ -127,7 +128,7 @@ export function Navbar() {
                 onMouseLeave={() => setServicesOpen(false)}
               >
                 <button className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-neutral-700 hover:text-primary rounded-lg hover:bg-neutral-50 transition-colors">
-                  Home Health Services
+                  Services
                   <ChevronDown className={cn("w-4 h-4 transition-transform", servicesOpen && "rotate-180")} />
                 </button>
                 <AnimatePresence>
@@ -153,17 +154,14 @@ export function Navbar() {
                 </AnimatePresence>
               </div>
 
-              <Link href="/blog" className="px-4 py-2 text-sm font-medium text-neutral-700 hover:text-primary rounded-lg hover:bg-neutral-50 transition-colors">
-                Blog
-              </Link>
-              <Link href="/feedback" className="px-4 py-2 text-sm font-medium text-neutral-700 hover:text-primary rounded-lg hover:bg-neutral-50 transition-colors">
-                Feedback
-              </Link>
               <Link href="/client-referral" className="px-4 py-2 text-sm font-medium text-neutral-700 hover:text-primary rounded-lg hover:bg-neutral-50 transition-colors">
-                Client Referral
+                Referral
               </Link>
               <Link href="/careers" className="px-4 py-2 text-sm font-medium text-neutral-700 hover:text-primary rounded-lg hover:bg-neutral-50 transition-colors">
-                Become a Caregiver
+                Careers
+              </Link>
+              <Link href="/blog" className="px-4 py-2 text-sm font-medium text-neutral-700 hover:text-primary rounded-lg hover:bg-neutral-50 transition-colors">
+                Blog
               </Link>
               <Link href="/contact" className="px-4 py-2 text-sm font-medium text-neutral-700 hover:text-primary rounded-lg hover:bg-neutral-50 transition-colors">
                 Contact
@@ -222,7 +220,7 @@ export function Navbar() {
                 ))}
 
                 {/* Services section */}
-                <div className="text-xs font-semibold text-neutral-400 uppercase tracking-wider px-3 pt-4 pb-1">Services</div>
+                <div className="text-xs font-semibold text-neutral-400 uppercase tracking-wider px-3 pt-4 pb-1">Home Health Services</div>
                 {services.map((service) => (
                   <Link
                     key={service.href}
@@ -236,17 +234,14 @@ export function Navbar() {
 
                 <div className="border-t border-neutral-100 my-2" />
 
-                <Link href="/blog" onClick={() => setIsOpen(false)} className="block px-3 py-2.5 text-neutral-700 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors">
-                  Blog
-                </Link>
-                <Link href="/feedback" onClick={() => setIsOpen(false)} className="block px-3 py-2.5 text-neutral-700 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors">
-                  Feedback
-                </Link>
                 <Link href="/client-referral" onClick={() => setIsOpen(false)} className="block px-3 py-2.5 text-neutral-700 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors">
                   Client Referral
                 </Link>
                 <Link href="/careers" onClick={() => setIsOpen(false)} className="block px-3 py-2.5 text-neutral-700 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors">
-                  Become a Caregiver
+                  Careers
+                </Link>
+                <Link href="/blog" onClick={() => setIsOpen(false)} className="block px-3 py-2.5 text-neutral-700 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors">
+                  Blog
                 </Link>
                 <Link href="/contact" onClick={() => setIsOpen(false)} className="block px-3 py-2.5 text-neutral-700 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors">
                   Contact
