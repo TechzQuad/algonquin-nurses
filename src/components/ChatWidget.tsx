@@ -20,7 +20,14 @@ type Phase =
   | "collect_email"
   | "collect_phone"
   | "lead_saved"
-  | "faq";
+  | "faq"
+  | "contact_intent"
+  | "contact_name"
+  | "contact_email"
+  | "contact_phone"
+  | "contact_service"
+  | "contact_message"
+  | "contact_done";
 
 type ServiceKey = "private-duty" | "medicaid" | "cds" | "veterans" | "hcy";
 
@@ -131,6 +138,7 @@ export function ChatWidget() {
   const [phase, setPhase] = useState<Phase>("greeting");
   const [selectedService, setSelectedService] = useState<ServiceKey | null>(null);
   const [lead, setLead] = useState({ name: "", email: "", phone: "" });
+  const [contactForm, setContactForm] = useState({ name: "", email: "", phone: "", service: "", message: "" });
   const [input, setInput] = useState("");
   const [saving, setSaving] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
@@ -176,10 +184,8 @@ export function ChatWidget() {
           [{ label: "View Careers →", href: "/careers" }]
         );
       } else if (label === "📞 Contact Us") {
-        bot(
-          "Our friendly team is ready to assist you! Send a message through our Contact page or call any of our three offices.",
-          [{ label: "Go to Contact Page →", href: "/contact" }]
-        );
+        setPhase("contact_intent");
+        bot("Our friendly team is ready to assist you! How would you like to reach us?");
       } else if (label === "❓ Ask a Question") {
         setPhase("faq");
         bot("Of course! Select a common question below or type your own.");
@@ -230,6 +236,41 @@ export function ChatWidget() {
         return;
       }
       bot(findFaqAnswer(label));
+    }
+
+    if (phase === "contact_intent") {
+      if (label === "✉️ Send a quick message") {
+        setContactForm({ name: "", email: "", phone: "", service: "", message: "" });
+        setPhase("contact_name");
+        bot("Let's get your message to the right person. 📝\n\nWhat's your full name?");
+      } else if (label === "🌐 Go to Contact Page") {
+        bot(
+          "No problem! You can fill out our full contact form and we'll get back to you within 1 business day.",
+          [{ label: "Go to Contact Page →", href: "/contact" }]
+        );
+        setPhase("greeting");
+      }
+    }
+
+    if (phase === "contact_service") {
+      const serviceMap: Record<string, string> = {
+        "Private Duty Care": "private-duty",
+        "Medicaid In-Home Care": "medicaid",
+        "Consumer Directed Services": "cds",
+        "Youth & Children Program": "hcy",
+        "Veterans Care": "veterans",
+        "⏭ Skip": "",
+      };
+      const value = serviceMap[label] ?? "";
+      setContactForm((prev) => ({ ...prev, service: value }));
+      setPhase("contact_message");
+      bot("Got it! Last step — what can we help you with? Leave us your message:");
+      return;
+    }
+
+    if (phase === "contact_done" && label === "← Back to main menu") {
+      setPhase("greeting");
+      bot("Is there anything else I can help you with today?");
     }
   }
 
@@ -294,6 +335,59 @@ export function ChatWidget() {
       return;
     }
 
+    if (phase === "contact_name") {
+      setContactForm((prev) => ({ ...prev, name: text }));
+      setPhase("contact_email");
+      bot(`Nice to meet you, ${text.split(" ")[0]}! 😊\n\nWhat's your email address?`);
+      return;
+    }
+
+    if (phase === "contact_email") {
+      if (!text.includes("@") || !text.includes(".")) {
+        bot("That doesn't look quite right. Please enter a valid email address.");
+        return;
+      }
+      setContactForm((prev) => ({ ...prev, email: text }));
+      setPhase("contact_phone");
+      bot("Great! And your phone number?");
+      return;
+    }
+
+    if (phase === "contact_phone") {
+      setContactForm((prev) => ({ ...prev, phone: text }));
+      setPhase("contact_service");
+      bot("Which service are you interested in? (or skip if you're not sure)");
+      return;
+    }
+
+    if (phase === "contact_message") {
+      const updated = { ...contactForm, message: text };
+      setContactForm(updated);
+      setSaving(true);
+      try {
+        await fetch("/api/contact", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            firstName: updated.name.split(" ")[0],
+            lastName: updated.name.split(" ").slice(1).join(" ") || "-",
+            email: updated.email,
+            phone: updated.phone,
+            service: updated.service || undefined,
+            message: updated.message,
+          }),
+        });
+      } catch {
+        // continue silently
+      }
+      setSaving(false);
+      setPhase("contact_done");
+      bot(
+        `✅ Message sent, ${updated.name.split(" ")[0]}!\n\nWe've received your message and will be in touch within 1 business day. A confirmation has been sent to ${updated.email}.`
+      );
+      return;
+    }
+
     // Fallback for other phases
     bot(
       "I'd love to help! Please use the options below, or call us anytime at (636) 274-1870."
@@ -309,21 +403,41 @@ export function ChatWidget() {
 
   // ── Computed state ───────────────────────────────────────────────────────
 
+  const SERVICE_QUICK = [
+    "Private Duty Care",
+    "Medicaid In-Home Care",
+    "Consumer Directed Services",
+    "Youth & Children Program",
+    "Veterans Care",
+    "⏭ Skip",
+  ];
+
   const quickReplies =
     phase === "greeting" ? MAIN_MENU
     : phase === "services_menu" ? SERVICE_MENU
     : phase === "service_detail" ? ["✅ Yes, contact me", "↩ Back to services"]
     : phase === "lead_saved" ? ["← Back to main menu"]
     : phase === "faq" ? FAQ_PROMPTS
+    : phase === "contact_intent" ? ["✉️ Send a quick message", "🌐 Go to Contact Page"]
+    : phase === "contact_service" ? SERVICE_QUICK
+    : phase === "contact_done" ? ["← Back to main menu"]
     : [];
 
-  const showInput = ["collect_name", "collect_email", "collect_phone", "faq"].includes(phase);
+  const showInput = [
+    "collect_name", "collect_email", "collect_phone",
+    "faq",
+    "contact_name", "contact_email", "contact_phone", "contact_message",
+  ].includes(phase);
 
   const inputPlaceholder: Record<string, string> = {
     collect_name: "Enter your full name...",
     collect_email: "Enter your email address...",
     collect_phone: "Enter your phone number...",
     faq: "Type your question...",
+    contact_name: "Enter your full name...",
+    contact_email: "Enter your email address...",
+    contact_phone: "Enter your phone number...",
+    contact_message: "Type your message...",
   };
 
   // ── Render ───────────────────────────────────────────────────────────────
@@ -478,7 +592,7 @@ export function ChatWidget() {
               className="flex items-center gap-2 p-3 border-t border-neutral-200 bg-white flex-shrink-0"
             >
               <input
-                type={phase === "collect_email" ? "email" : "text"}
+                type={phase === "collect_email" || phase === "contact_email" ? "email" : "text"}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder={inputPlaceholder[phase] ?? "Type a message..."}
