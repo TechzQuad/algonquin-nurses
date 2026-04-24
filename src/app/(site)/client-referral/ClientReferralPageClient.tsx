@@ -54,7 +54,7 @@ export function ClientReferralPageClient() {
           <SectionHeading
             label="Why Refer"
             title="Help Someone Get the Care They Need"
-            description="When you refer a client to Algonquin Nurses, you're connecting them with over 37 years of trusted home health care."
+            description={`When you refer a client to Algonquin Nurses, you're connecting them with over ${new Date().getFullYear() - 1987} years of trusted home health care.`}
           />
           <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
             {[

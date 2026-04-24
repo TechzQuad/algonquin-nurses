@@ -91,7 +91,7 @@ export function Footer() {
                   <MapPin className="w-4 h-4 mt-0.5 text-accent-light flex-shrink-0" />
                   <div>
                     <p className="text-sm font-medium">St. Louis Office</p>
-                    <p className="text-sm text-white/70">10135 Manchester Rd., St. Louis, MO 63122</p>
+                    <p className="text-sm text-white/70">10135 Manchester Rd., St. Louis,<br />MO 63122</p>
                     <a href="tel:3148228158" className="text-sm text-accent-light hover:text-white transition-colors flex items-center gap-1 mt-1">
                       <Phone className="w-3.5 h-3.5" /> (314) 822-8158
                     </a>
