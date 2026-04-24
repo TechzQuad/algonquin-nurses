@@ -24,6 +24,7 @@ export async function POST(request: Request) {
       data: {
         referrerName: String(referrerName),
         referrerPhone: String(referrerPhone),
+        referrerEmail: referrerEmail ? String(referrerEmail) : undefined,
         clientName: String(clientName),
         clientPhone: clientPhone ? String(clientPhone) : undefined,
         service: (service ? String(service) : undefined) as

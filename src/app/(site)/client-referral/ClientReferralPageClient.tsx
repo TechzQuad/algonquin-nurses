@@ -130,6 +130,10 @@ export function ClientReferralPageClient() {
                     <input type="tel" id="refYourPhone" name="referrerPhone" required className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors" />
                   </div>
                 </div>
+                <div className="mt-4">
+                  <label htmlFor="refYourEmail" className="block text-sm font-medium text-neutral-700 mb-1.5">Your Email <span className="text-neutral-400 font-normal">(for confirmation)</span></label>
+                  <input type="email" id="refYourEmail" name="referrerEmail" className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors" placeholder="you@example.com" />
+                </div>
               </div>
 
               <div className="bg-white rounded-xl p-6 border border-neutral-100">

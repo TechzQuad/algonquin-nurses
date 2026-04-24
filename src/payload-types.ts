@@ -346,6 +346,7 @@ export interface Referral {
   id: number;
   referrerName: string;
   referrerPhone: string;
+  referrerEmail?: string | null;
   clientName: string;
   clientPhone?: string | null;
   service?: ('private-duty' | 'medicaid' | 'cds' | 'hcy' | 'veterans' | 'other') | null;
@@ -692,6 +693,7 @@ export interface ContactSubmissionsSelect<T extends boolean = true> {
 export interface ReferralsSelect<T extends boolean = true> {
   referrerName?: T;
   referrerPhone?: T;
+  referrerEmail?: T;
   clientName?: T;
   clientPhone?: T;
   service?: T;

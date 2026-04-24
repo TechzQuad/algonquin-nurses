@@ -17,6 +17,7 @@ export const Referrals: CollectionConfig = {
   fields: [
     { name: "referrerName", type: "text", required: true },
     { name: "referrerPhone", type: "text", required: true },
+    { name: "referrerEmail", type: "email" },
     { name: "clientName", type: "text", required: true },
     { name: "clientPhone", type: "text" },
     {
