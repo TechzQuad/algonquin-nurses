@@ -171,7 +171,7 @@ export function Navbar() {
 
               <Link
                 href="/contact"
-                className="ml-3 px-5 py-2.5 bg-chat hover:bg-chat-dark text-white text-sm font-semibold rounded-lg transition-colors shadow-sm"
+                className="ml-3 px-5 py-2.5 bg-accent hover:bg-accent-light text-white text-sm font-semibold rounded-lg transition-colors shadow-sm"
               >
                 Free Consultation
               </Link>
@@ -269,7 +269,7 @@ export function Navbar() {
                 <Link
                   href="/contact"
                   onClick={() => setIsOpen(false)}
-                  className="block mx-3 mt-4 mb-2 px-5 py-3 bg-chat hover:bg-chat-dark text-white text-center font-semibold rounded-lg transition-colors"
+                  className="block mx-3 mt-4 mb-2 px-5 py-3 bg-accent hover:bg-accent-light text-white text-center font-semibold rounded-lg transition-colors"
                 >
                   Get Free Consultation
                 </Link>
