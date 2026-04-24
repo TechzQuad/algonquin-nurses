@@ -83,7 +83,7 @@ export function CareersPageClient() {
         subtitle="Join Our Team"
         title="Become a Caregiver"
         description="Make a difference in someone's life every day. Join the Algonquin Nurses family and build a rewarding career in home health care."
-        imageSrc="/images/living-option-3.jpg"
+        imageSrc="/images/main-slider-5-3-1.jpg"
         imageAlt="Caregiver assisting client at home"
         compact
       />
