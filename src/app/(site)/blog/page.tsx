@@ -121,13 +121,15 @@ export default async function BlogIndexPage({
   const { category } = await searchParams;
   const payload = await getPayloadClient();
 
-  // Fetch all categories for the filter tabs
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { docs: allCategories } = await (payload as any).find({
-    collection: "categories",
-    limit: 20,
-    depth: 0,
-  });
+  // Fetch all categories for the filter tabs (table may not exist yet on first deploy)
+  let allCategories: unknown[] = [];
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const result = await (payload as any).find({ collection: "categories", limit: 20, depth: 0 });
+    allCategories = result.docs ?? [];
+  } catch {
+    // Categories table not yet migrated — degrade gracefully
+  }
 
   // Build query — always filter to published only
   let activeCategoryDoc: Category | null = null;
