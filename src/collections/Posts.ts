@@ -1,5 +1,5 @@
 import type { CollectionConfig } from "payload";
-import { lexicalEditor } from "@payloadcms/richtext-lexical";
+import { lexicalEditor, HorizontalRuleFeature } from "@payloadcms/richtext-lexical";
 
 export const Posts: CollectionConfig = {
   slug: "posts",
@@ -88,7 +88,9 @@ export const Posts: CollectionConfig = {
     {
       name: "content",
       type: "richText",
-      editor: lexicalEditor({}),
+      editor: lexicalEditor({
+        features: ({ defaultFeatures }) => [...defaultFeatures, HorizontalRuleFeature()],
+      }),
     },
 
     // ── Taxonomy ─────────────────────────────────────────────────────────
