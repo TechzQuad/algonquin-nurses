@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import { draftMode } from "next/headers";
 import { Calendar, ArrowLeft, ArrowRight, Clock, Tag, ChevronRight } from "lucide-react";
 import { RichText } from "@payloadcms/richtext-lexical/react";
 import { getPayloadClient } from "@/lib/payload";
@@ -9,6 +10,7 @@ import { extractHeadings } from "@/lib/markdownToLexical";
 import { CTASection } from "@/components/CTASection";
 import { TableOfContents } from "@/components/blog/TableOfContents";
 import { SocialShare } from "@/components/blog/SocialShare";
+import { PreviewBanner } from "@/components/blog/PreviewBanner";
 
 export const revalidate = 300;
 export const dynamicParams = true;
@@ -40,7 +42,6 @@ type Category = {
   id: string | number;
   name: string;
   slug: string;
-  color?: string | null;
 };
 
 type PostDoc = {
@@ -62,19 +63,25 @@ type PostDoc = {
 
 // ── Data helpers ─────────────────────────────────────────────────────────────
 
-async function getPost(slug: string): Promise<PostDoc | null> {
+async function getPost(slug: string, preview: boolean): Promise<PostDoc | null> {
   const payload = await getPayloadClient();
+  const where = preview
+    ? // In preview: fetch any status so admins can see drafts
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ({ slug: { equals: slug } } as any)
+    : // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ({ and: [{ slug: { equals: slug } }, { status: { equals: "published" } }] } as any);
+
   const { docs } = await payload.find({
     collection: "posts",
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    where: { and: [{ slug: { equals: slug } }, { status: { equals: "published" } }] } as any,
+    where,
     limit: 1,
     depth: 2,
   });
   return (docs[0] as unknown as PostDoc) ?? null;
 }
 
-async function getRelated(currentId: string | number, cats: string[]): Promise<PostDoc[]> {
+async function getRelated(currentId: string | number): Promise<PostDoc[]> {
   const payload = await getPayloadClient();
   const { docs } = await payload.find({
     collection: "posts",
@@ -92,7 +99,8 @@ export async function generateStaticParams() {
     const payload = await getPayloadClient();
     const { docs } = await payload.find({
       collection: "posts",
-      where: { status: { equals: "published" } },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      where: { status: { equals: "published" } } as any,
       limit: 200,
       depth: 0,
     });
@@ -163,24 +171,19 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const post = await getPost(slug);
+  const { isEnabled: isPreview } = await draftMode();
+  const post = await getPost(slug, isPreview);
   if (!post) return { title: "Post Not Found", robots: { index: false, follow: false } };
 
   const cover = getCover(post);
   const seo = post.seo ?? {};
   const title = seo.metaTitle?.trim() || post.title;
-  const description =
-    seo.metaDescription?.trim() || post.excerpt?.trim() || undefined;
+  const description = seo.metaDescription?.trim() || post.excerpt?.trim() || undefined;
   const canonical = seo.canonicalUrl?.trim() || `${SITE_URL}/blog/${post.slug}`;
   const ogTitle = seo.ogTitle?.trim() || title;
   const ogDescription = seo.ogDescription?.trim() || description;
   const ogImage = cover?.url
-    ? {
-        url: cover.url,
-        width: cover.width ?? 1600,
-        height: cover.height ?? 900,
-        alt: cover.alt || post.title,
-      }
+    ? { url: cover.url, width: cover.width ?? 1600, height: cover.height ?? 900, alt: cover.alt || post.title }
     : undefined;
 
   return {
@@ -189,19 +192,20 @@ export async function generateMetadata({
     description,
     keywords: seo.keywords?.split(",").map((k) => k.trim()).filter(Boolean),
     alternates: { canonical },
-    robots: seo.noIndex
-      ? { index: false, follow: false }
-      : {
-          index: true,
-          follow: true,
-          googleBot: {
+    robots:
+      seo.noIndex || isPreview
+        ? { index: false, follow: false }
+        : {
             index: true,
             follow: true,
-            "max-image-preview": "large",
-            "max-snippet": -1,
-            "max-video-preview": -1,
+            googleBot: {
+              index: true,
+              follow: true,
+              "max-image-preview": "large",
+              "max-snippet": -1,
+              "max-video-preview": -1,
+            },
           },
-        },
     authors: [{ name: ORG_NAME, url: SITE_URL }],
     openGraph: {
       title: ogTitle,
@@ -233,21 +237,22 @@ export default async function BlogPostPage({
   params: Promise<Params>;
 }) {
   const { slug } = await params;
-  const post = await getPost(slug);
+  const { isEnabled: isPreview } = await draftMode();
+
+  const post = await getPost(slug, isPreview);
   if (!post) notFound();
 
   const cats = getCategories(post);
-  const related = await getRelated(post.id, cats.map((c) => String(c.id)));
+  const related = await getRelated(post.id);
   const cover = getCover(post);
   const canonical = post.seo?.canonicalUrl?.trim() || `${SITE_URL}/blog/${post.slug}`;
-  const description =
-    post.seo?.metaDescription?.trim() || post.excerpt?.trim() || undefined;
+  const description = post.seo?.metaDescription?.trim() || post.excerpt?.trim() || undefined;
   const minutes = readingTime(post.content);
   const wc = wordCount(post.content);
   const headings = extractHeadings(post.content);
   const pageUrl = `${SITE_URL}/blog/${post.slug}`;
+  const adminEditUrl = `/admin/collections/posts/${post.id}`;
 
-  // JSON-LD schemas
   const articleSchema = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
@@ -268,9 +273,7 @@ export default async function BlogPostPage({
       name: ORG_NAME,
       logo: { "@type": "ImageObject", url: ORG_LOGO },
     },
-    ...(cats.length > 0 && {
-      articleSection: cats.map((c) => c.name).join(", "),
-    }),
+    ...(cats.length > 0 && { articleSection: cats.map((c) => c.name).join(", ") }),
   };
 
   const breadcrumbSchema = {
@@ -283,11 +286,6 @@ export default async function BlogPostPage({
     ],
   };
 
-  // FAQ schema — extract from content if headings mention "faq" or "question"
-  const hasFaqSection = headings.some((h) =>
-    /faq|question|ask/i.test(h.text)
-  );
-
   return (
     <>
       <script
@@ -299,39 +297,28 @@ export default async function BlogPostPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
 
-      <article className="bg-white min-h-screen">
+      {/* Preview mode banner — fixed at top, only for admins */}
+      {isPreview && (
+        <PreviewBanner status={post.status} adminEditUrl={adminEditUrl} />
+      )}
+
+      <article className={`bg-white min-h-screen${isPreview ? " pt-12" : ""}`}>
         {/* ── Post header ───────────────────────────────────────────────── */}
         <header className="pt-12 lg:pt-20 pb-10 bg-gradient-to-b from-neutral-50 to-white border-b border-neutral-100">
           <div className="max-w-4xl mx-auto px-4 sm:px-6">
             {/* Breadcrumb */}
             <nav aria-label="Breadcrumb" className="mb-6">
               <ol className="flex items-center gap-1.5 text-xs text-neutral-400">
-                <li>
-                  <Link href="/" className="hover:text-primary transition-colors">
-                    Home
-                  </Link>
-                </li>
-                <li aria-hidden="true">
-                  <ChevronRight className="w-3 h-3" />
-                </li>
-                <li>
-                  <Link href="/blog" className="hover:text-primary transition-colors">
-                    Blog
-                  </Link>
-                </li>
-                <li aria-hidden="true">
-                  <ChevronRight className="w-3 h-3" />
-                </li>
-                <li
-                  className="text-neutral-600 font-medium truncate max-w-[240px]"
-                  aria-current="page"
-                >
+                <li><Link href="/" className="hover:text-primary transition-colors">Home</Link></li>
+                <li aria-hidden="true"><ChevronRight className="w-3 h-3" /></li>
+                <li><Link href="/blog" className="hover:text-primary transition-colors">Blog</Link></li>
+                <li aria-hidden="true"><ChevronRight className="w-3 h-3" /></li>
+                <li className="text-neutral-600 font-medium truncate max-w-[240px]" aria-current="page">
                   {post.title}
                 </li>
               </ol>
             </nav>
 
-            {/* Back link */}
             <Link
               href="/blog"
               className="inline-flex items-center gap-1.5 text-primary font-medium text-sm mb-6 hover:gap-2.5 transition-all"
@@ -354,19 +341,16 @@ export default async function BlogPostPage({
               </div>
             )}
 
-            {/* Title */}
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-neutral-900 leading-tight mb-5">
               {post.title}
             </h1>
 
-            {/* Excerpt / lead */}
             {post.excerpt && (
-              <p className="text-xl text-neutral-600 leading-relaxed mb-6 max-w-2xl">
+              <p className="text-xl text-neutral-600 leading-relaxed mb-6">
                 {post.excerpt}
               </p>
             )}
 
-            {/* Meta row */}
             <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-neutral-500">
               {post.publishedAt && (
                 <span className="inline-flex items-center gap-1.5">
@@ -380,13 +364,22 @@ export default async function BlogPostPage({
               </span>
               <span className="text-neutral-300">·</span>
               <span className="text-neutral-400">{wc.toLocaleString()} words</span>
+              {/* Show draft badge in preview */}
+              {isPreview && post.status !== "published" && (
+                <>
+                  <span className="text-neutral-300">·</span>
+                  <span className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">
+                    {post.status === "pending_review" ? "Pending Review" : "Draft"}
+                  </span>
+                </>
+              )}
             </div>
           </div>
         </header>
 
         {/* ── Cover image ────────────────────────────────────────────────── */}
         {cover?.url && (
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-8">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-8">
             <figure className="relative aspect-[16/9] rounded-2xl overflow-hidden shadow-md">
               <Image
                 src={cover.url}
@@ -394,7 +387,7 @@ export default async function BlogPostPage({
                 fill
                 priority
                 className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 1024px"
+                sizes="(max-width: 1024px) 100vw, 896px"
               />
               {cover.alt && <figcaption className="sr-only">{cover.alt}</figcaption>}
             </figure>
@@ -402,90 +395,90 @@ export default async function BlogPostPage({
         )}
 
         {/* ── Body: content + ToC sidebar ────────────────────────────────── */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 lg:py-16">
-          <div className="lg:grid lg:grid-cols-[1fr_280px] lg:gap-12 xl:gap-16">
-            {/* Content */}
-            <div>
-              {/* Focus keyphrase (hidden, for internal reference) */}
-              {post.focusKeyphrase && (
-                <meta name="keywords" content={post.focusKeyphrase} />
-              )}
+        <div className="py-12 lg:py-16">
+          {/* Centered content — same width as header (max-w-4xl) */}
+          <div className="max-w-4xl mx-auto px-4 sm:px-6">
+            {/* On large screens: flex row with ToC sidebar beside content */}
+            <div className="lg:flex lg:gap-12 lg:items-start">
 
-              <div
-                id="article-content"
-                className="prose prose-lg prose-neutral max-w-none
-                  prose-headings:font-bold prose-headings:text-neutral-900 prose-headings:scroll-mt-24
-                  prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-4
-                  prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3
-                  prose-p:text-neutral-700 prose-p:leading-relaxed
-                  prose-a:text-primary prose-a:font-medium hover:prose-a:underline
-                  prose-strong:text-neutral-900
-                  prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:bg-primary/5 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-lg prose-blockquote:not-italic
-                  prose-code:bg-neutral-100 prose-code:text-neutral-800 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm
-                  prose-li:text-neutral-700
-                  prose-img:rounded-xl prose-img:shadow-sm"
-              >
-                {post.content ? (
-                  <RichText
-                    data={post.content as Parameters<typeof RichText>[0]["data"]}
-                  />
-                ) : null}
-              </div>
+              {/* Main content column */}
+              <div className="flex-1 min-w-0">
+                <div
+                  id="article-content"
+                  className="prose prose-lg prose-neutral max-w-none
+                    prose-headings:font-bold prose-headings:text-neutral-900 prose-headings:scroll-mt-28
+                    prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-4
+                    prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3
+                    prose-p:text-neutral-700 prose-p:leading-relaxed
+                    prose-a:text-primary prose-a:font-medium hover:prose-a:underline
+                    prose-strong:text-neutral-900
+                    prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:bg-primary/5 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-lg prose-blockquote:not-italic
+                    prose-code:bg-neutral-100 prose-code:text-neutral-800 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm
+                    prose-li:text-neutral-700
+                    prose-img:rounded-xl prose-img:shadow-sm"
+                >
+                  {post.content ? (
+                    <RichText
+                      data={post.content as Parameters<typeof RichText>[0]["data"]}
+                    />
+                  ) : null}
+                </div>
 
-              {/* Tags */}
-              {post.tags && post.tags.length > 0 && (
+                {/* Tags */}
+                {post.tags && post.tags.length > 0 && (
+                  <div className="mt-10 pt-8 border-t border-neutral-100">
+                    <p className="text-xs font-semibold text-neutral-400 uppercase tracking-widest mb-3">
+                      Tags
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {post.tags.map(({ tag }) => (
+                        <span
+                          key={tag}
+                          className="inline-flex items-center gap-1 text-xs text-neutral-500 bg-neutral-50 border border-neutral-200 px-3 py-1 rounded-full"
+                        >
+                          <Tag className="w-3 h-3" />
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Social sharing */}
                 <div className="mt-10 pt-8 border-t border-neutral-100">
-                  <p className="text-xs font-semibold text-neutral-400 uppercase tracking-widest mb-3">
-                    Tags
+                  <p className="text-xs font-semibold text-neutral-400 uppercase tracking-widest mb-4">
+                    Share this article
                   </p>
-                  <div className="flex flex-wrap gap-2">
-                    {post.tags.map(({ tag }) => (
-                      <span
-                        key={tag}
-                        className="inline-flex items-center gap-1 text-xs text-neutral-500 bg-neutral-50 border border-neutral-200 px-3 py-1 rounded-full"
-                      >
-                        <Tag className="w-3 h-3" />
-                        {tag}
-                      </span>
-                    ))}
+                  <SocialShare url={pageUrl} title={post.title} />
+                </div>
+
+                {/* Author box */}
+                <div className="mt-10 p-6 bg-neutral-50 rounded-2xl border border-neutral-100">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                      <span className="text-primary font-bold text-lg">A</span>
+                    </div>
+                    <div>
+                      <p className="font-bold text-neutral-900 text-sm">
+                        Algonquin Nurses Editorial Team
+                      </p>
+                      <p className="text-xs text-neutral-500 mt-0.5">
+                        Expert home health care guidance for St. Louis families
+                      </p>
+                    </div>
                   </div>
                 </div>
+              </div>
+
+              {/* Sticky ToC sidebar — visible only on large screens */}
+              {headings.length > 2 && (
+                <aside className="hidden lg:block w-64 shrink-0">
+                  <div className="sticky top-28">
+                    <TableOfContents headings={headings} />
+                  </div>
+                </aside>
               )}
-
-              {/* Social sharing */}
-              <div className="mt-10 pt-8 border-t border-neutral-100">
-                <p className="text-xs font-semibold text-neutral-400 uppercase tracking-widest mb-4">
-                  Share this article
-                </p>
-                <SocialShare url={pageUrl} title={post.title} />
-              </div>
-
-              {/* Author box */}
-              <div className="mt-10 p-6 bg-neutral-50 rounded-2xl border border-neutral-100">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                    <span className="text-primary font-bold text-lg">A</span>
-                  </div>
-                  <div>
-                    <p className="font-bold text-neutral-900 text-sm">
-                      Algonquin Nurses Editorial Team
-                    </p>
-                    <p className="text-xs text-neutral-500 mt-0.5">
-                      Expert home health care guidance for St. Louis families
-                    </p>
-                  </div>
-                </div>
-              </div>
             </div>
-
-            {/* ── Sticky sidebar: Table of Contents ─────────────────────── */}
-            {headings.length > 2 && (
-              <aside className="hidden lg:block">
-                <div className="sticky top-24">
-                  <TableOfContents headings={headings} />
-                </div>
-              </aside>
-            )}
           </div>
         </div>
 
@@ -495,7 +488,7 @@ export default async function BlogPostPage({
             className="py-16 lg:py-20 bg-neutral-50 border-t border-neutral-100"
             aria-label="Related articles"
           >
-            <div className="max-w-7xl mx-auto px-4 sm:px-6">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6">
               <div className="flex items-center gap-4 mb-8">
                 <h2 className="text-2xl font-bold text-neutral-900">Keep reading</h2>
                 <div className="flex-1 h-px bg-neutral-200" />
@@ -526,9 +519,7 @@ export default async function BlogPostPage({
                         )}
                       </div>
                       <div className="p-5 flex-1 flex flex-col">
-                        <p className="text-xs text-neutral-400 mb-2">
-                          {formatDate(r.publishedAt)}
-                        </p>
+                        <p className="text-xs text-neutral-400 mb-2">{formatDate(r.publishedAt)}</p>
                         <h3 className="font-bold text-neutral-900 mb-2 leading-snug group-hover:text-primary transition-colors text-sm">
                           {r.title}
                         </h3>

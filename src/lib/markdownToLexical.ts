@@ -1,6 +1,7 @@
 // Converts a markdown string to the Payload Lexical JSON format.
-// Handles: paragraphs, h1–h6, bold, italic, bold+italic, bullet lists,
-// ordered lists, blockquotes, and horizontal rules.
+// Handles: paragraphs, h1–h6, bold, italic, bold+italic, inline code,
+// bullet lists, ordered lists, blockquotes, horizontal rules,
+// inline links [text](url), and [IMAGE:mediaId] upload markers.
 
 type TextNode = {
   type: "text";
@@ -10,6 +11,15 @@ type TextNode = {
   mode: "normal";
   detail: number;
   version: 1;
+};
+
+type LinkNode = {
+  type: "link";
+  version: 1;
+  format: string;
+  indent: number;
+  fields: { url: string; linkType: "custom"; newTab: boolean };
+  children: TextNode[];
 };
 
 type LexicalChild = Record<string, unknown>;
@@ -33,25 +43,49 @@ function textNode(text: string, format = 0): TextNode {
   return { type: "text", text, format, style: "", mode: "normal", detail: 0, version: 1 };
 }
 
-// Parses inline markdown: ***bold+italic***, **bold**, *italic*, `code`
-function parseInline(raw: string): TextNode[] {
-  const nodes: TextNode[] = [];
-  const re = /(\*\*\*[^*]+?\*\*\*|\*\*[^*]+?\*\*|\*[^*]+?\*|`[^`]+`)/g;
+function linkNode(url: string, children: TextNode[]): LinkNode {
+  return {
+    type: "link",
+    version: 1,
+    format: "",
+    indent: 0,
+    fields: { url, linkType: "custom", newTab: false },
+    children,
+  };
+}
+
+// Parses inline markdown including links and formatting
+function parseInline(raw: string): (TextNode | LinkNode)[] {
+  const nodes: (TextNode | LinkNode)[] = [];
+  // Match: links [text](url), ***b+i***, **bold**, *italic*, `code`
+  const re =
+    /(\[([^\]]+)\]\(([^)]+)\)|\*\*\*[^*]+?\*\*\*|\*\*[^*]+?\*\*|\*[^*]+?\*|`[^`]+`)/g;
   let last = 0;
   let m: RegExpExecArray | null;
 
   while ((m = re.exec(raw)) !== null) {
     if (m.index > last) nodes.push(textNode(raw.slice(last, m.index)));
     const seg = m[0];
-    if (seg.startsWith("***")) nodes.push(textNode(seg.slice(3, -3), 3));        // bold+italic
-    else if (seg.startsWith("**")) nodes.push(textNode(seg.slice(2, -2), 1));    // bold
-    else if (seg.startsWith("*")) nodes.push(textNode(seg.slice(1, -1), 2));     // italic
-    else if (seg.startsWith("`")) nodes.push(textNode(seg.slice(1, -1), 16));    // code
+
+    if (seg.startsWith("[") && m[2] && m[3]) {
+      // Markdown link
+      const innerText = m[2];
+      const url = m[3];
+      nodes.push(linkNode(url, [textNode(innerText)]));
+    } else if (seg.startsWith("***")) {
+      nodes.push(textNode(seg.slice(3, -3), 3)); // bold+italic
+    } else if (seg.startsWith("**")) {
+      nodes.push(textNode(seg.slice(2, -2), 1)); // bold
+    } else if (seg.startsWith("*")) {
+      nodes.push(textNode(seg.slice(1, -1), 2)); // italic
+    } else if (seg.startsWith("`")) {
+      nodes.push(textNode(seg.slice(1, -1), 16)); // code
+    }
     last = m.index + seg.length;
   }
 
   if (last < raw.length) nodes.push(textNode(raw.slice(last)));
-  return nodes.filter((n) => n.text.length > 0);
+  return nodes.filter((n) => n.type !== "text" || (n as TextNode).text.length > 0);
 }
 
 function paragraphNode(text: string): LexicalNode {
@@ -117,6 +151,16 @@ function quoteNode(text: string): LexicalNode {
   };
 }
 
+function uploadNode(mediaId: string): LexicalNode {
+  return {
+    type: "upload",
+    version: 1,
+    format: "",
+    relationTo: "media",
+    value: { id: mediaId },
+  };
+}
+
 export function markdownToLexical(markdown: string): { root: RootNode } {
   const lines = markdown.split("\n");
   const children: LexicalNode[] = [];
@@ -126,6 +170,14 @@ export function markdownToLexical(markdown: string): { root: RootNode } {
     const line = lines[i];
 
     if (!line.trim()) {
+      i++;
+      continue;
+    }
+
+    // [IMAGE:mediaId] marker — insert upload node
+    const imgMatch = line.trim().match(/^\[IMAGE:([^\]]+)\]$/);
+    if (imgMatch) {
+      children.push(uploadNode(imgMatch[1].trim()));
       i++;
       continue;
     }
@@ -148,8 +200,7 @@ export function markdownToLexical(markdown: string): { root: RootNode } {
 
     // Horizontal rule
     if (/^[-*_]{3,}$/.test(line.trim())) {
-      // Render as an empty paragraph (Lexical doesn't have a native HR)
-      children.push(paragraphNode(""));
+      children.push({ type: "horizontalrule", version: 1 });
       i++;
       continue;
     }
@@ -185,7 +236,8 @@ export function markdownToLexical(markdown: string): { root: RootNode } {
       !lines[i].startsWith("> ") &&
       !/^[-*+]\s+/.test(lines[i]) &&
       !/^\d+\.\s+/.test(lines[i]) &&
-      !/^[-*_]{3,}$/.test(lines[i].trim())
+      !/^[-*_]{3,}$/.test(lines[i].trim()) &&
+      !lines[i].trim().match(/^\[IMAGE:[^\]]+\]$/)
     ) {
       para.push(lines[i].trim());
       i++;
@@ -195,7 +247,6 @@ export function markdownToLexical(markdown: string): { root: RootNode } {
     }
   }
 
-  // Ensure at least one paragraph so Lexical doesn't error on empty doc
   if (children.length === 0) {
     children.push(paragraphNode(""));
   }

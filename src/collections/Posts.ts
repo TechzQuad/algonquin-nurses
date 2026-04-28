@@ -1,5 +1,10 @@
 import type { CollectionConfig } from "payload";
 import { lexicalEditor, HorizontalRuleFeature } from "@payloadcms/richtext-lexical";
+import { enhanceBlogPost } from "@/lib/blogEnhancer";
+
+// Module-level set prevents the afterChange hook from triggering itself
+// when it calls payload.update() to save the enhanced content.
+const enhancingIds = new Set<string | number>();
 
 export const Posts: CollectionConfig = {
   slug: "posts",
@@ -7,6 +12,19 @@ export const Posts: CollectionConfig = {
     useAsTitle: "title",
     defaultColumns: ["title", "status", "publishedAt", "updatedAt"],
     description: "Blog posts and articles. New posts start as Draft by default.",
+    // Preview button — opens the post in the browser with Draft Mode enabled
+    preview: (doc, { token }) => {
+      const base =
+        process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+      return `${base}/api/preview?slug=${doc.slug}&token=${token}`;
+    },
+    livePreview: {
+      url: ({ data }) => {
+        const base =
+          process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+        return `${base}/blog/${data.slug}`;
+      },
+    },
   },
   access: {
     read: ({ req: { user } }) => {
@@ -39,6 +57,94 @@ export const Posts: CollectionConfig = {
           data.publishedAt = new Date().toISOString();
         }
         return data;
+      },
+    ],
+    afterChange: [
+      async ({ doc, req }) => {
+        // Skip if this update was triggered by our own enhancement (prevents infinite loop)
+        if (enhancingIds.has(doc.id)) return doc;
+        // Skip if no AI key configured or content is empty
+        if (!process.env.ANTHROPIC_API_KEY || !doc.content) return doc;
+
+        enhancingIds.add(doc.id);
+
+        try {
+          // Fetch other posts for internal link suggestions
+          const { docs: otherPosts } = await req.payload.find({
+            collection: "posts",
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            where: { and: [{ id: { not_equals: doc.id } }, { status: { equals: "published" } }] } as any,
+            limit: 8,
+            depth: 0,
+          });
+
+          // Fetch services for internal links
+          let services: { title?: string | null; slug?: string | null; description?: string | null }[] = [];
+          try {
+            const { docs: svcDocs } = await req.payload.find({
+              collection: "services",
+              limit: 10,
+              depth: 0,
+            });
+            services = svcDocs as typeof services;
+          } catch {
+            // services collection may not exist
+          }
+
+          // Fetch media images for inline image insertion
+          const { docs: mediaDocs } = await req.payload.find({
+            collection: "media",
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            where: { mimeType: { contains: "image" } } as any,
+            limit: 10,
+            depth: 0,
+          });
+
+          const media = mediaDocs.map((m) => ({
+            id: (m as { id: string | number }).id,
+            alt: (m as { alt?: string }).alt ?? null,
+            url: (m as { url?: string }).url ?? null,
+          }));
+
+          const enhanced = await enhanceBlogPost(
+            doc.content,
+            doc.title as string,
+            doc.focusKeyphrase as string | null,
+            otherPosts.map((p) => ({
+              title: (p as { title: string }).title,
+              slug: (p as { slug: string }).slug,
+              excerpt: (p as { excerpt?: string }).excerpt ?? null,
+            })),
+            services,
+            media
+          );
+
+          // Save enhanced content back — enhancingIds prevents re-triggering
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          await (req.payload as any).update({
+            collection: "posts",
+            id: doc.id,
+            data: {
+              content: enhanced.content,
+              focusKeyphrase: enhanced.focusKeyphrase,
+              seo: {
+                ...(doc.seo ?? {}),
+                metaTitle: enhanced.seo.metaTitle,
+                metaDescription: enhanced.seo.metaDescription,
+                keywords: enhanced.seo.keywords,
+                ogTitle: enhanced.seo.ogTitle,
+                ogDescription: enhanced.seo.ogDescription,
+              },
+            },
+          });
+        } catch (err) {
+          // Enhancement is best-effort — never block the original save
+          console.error("[blogEnhancer] Enhancement failed for post", doc.id, err);
+        } finally {
+          enhancingIds.delete(doc.id);
+        }
+
+        return doc;
       },
     ],
   },
