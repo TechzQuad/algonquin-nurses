@@ -12,6 +12,7 @@ import { Services } from "./collections/Services.ts";
 import { Team } from "./collections/Team.ts";
 import { Testimonials } from "./collections/Testimonials.ts";
 import { Posts } from "./collections/Posts.ts";
+import { Categories } from "./collections/Categories.ts";
 import { ContactSubmissions } from "./collections/ContactSubmissions.ts";
 import { Referrals } from "./collections/Referrals.ts";
 import { Feedback } from "./collections/Feedback.ts";
@@ -36,6 +37,7 @@ export default buildConfig({
     Team,
     Testimonials,
     Posts,
+    Categories,
     ContactSubmissions,
     Referrals,
     Feedback,
