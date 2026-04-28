@@ -73,6 +73,7 @@ export interface Config {
     team: Team;
     testimonials: Testimonial;
     posts: Post;
+    categories: Category;
     'contact-submissions': ContactSubmission;
     referrals: Referral;
     feedback: Feedback;
@@ -92,6 +93,7 @@ export interface Config {
     team: TeamSelect<false> | TeamSelect<true>;
     testimonials: TestimonialsSelect<false> | TestimonialsSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
+    categories: CategoriesSelect<false> | CategoriesSelect<true>;
     'contact-submissions': ContactSubmissionsSelect<false> | ContactSubmissionsSelect<true>;
     referrals: ReferralsSelect<false> | ReferralsSelect<true>;
     feedback: FeedbackSelect<false> | FeedbackSelect<true>;
@@ -276,14 +278,28 @@ export interface Testimonial {
   createdAt: string;
 }
 /**
+ * Blog posts and articles. New posts start as Draft by default.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "posts".
  */
 export interface Post {
   id: number;
+  /**
+   * H1 headline — 50–60 characters is ideal for SEO.
+   */
   title: string;
+  /**
+   * URL path (e.g. home-care-tips-st-louis). Auto-generated from title if left blank.
+   */
   slug: string;
+  /**
+   * 2–3 sentence summary. Shown on the blog index and used as the default meta description.
+   */
   excerpt?: string | null;
+  /**
+   * Recommended: 1600×900 px (16:9). Alt text is required for SEO.
+   */
   coverImage?: (number | null) | Media;
   content?: {
     root: {
@@ -300,26 +316,90 @@ export interface Post {
     };
     [k: string]: unknown;
   } | null;
+  /**
+   * Choose one or two categories.
+   */
+  categories?: (number | Category)[] | null;
+  /**
+   * Keyword tags for related content and SEO.
+   */
+  tags?:
+    | {
+        tag: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Set to "Published" to make this post live. New posts default to Draft.
+   */
+  status: 'draft' | 'pending_review' | 'published';
+  /**
+   * Auto-set when first published. Override to backdate or schedule.
+   */
   publishedAt?: string | null;
   author?: (number | null) | User;
+  /**
+   * Displayed as the hero featured post on the blog index.
+   */
+  featured?: boolean | null;
+  /**
+   * Primary keyword phrase this post targets (e.g. 'home health care St. Louis').
+   */
+  focusKeyphrase?: string | null;
   seo?: {
     /**
-     * Overrides the post title in <title> and og:title (50–60 chars ideal)
+     * Page <title> tag. 50–60 chars ideal. Falls back to post title.
      */
     metaTitle?: string | null;
     /**
-     * Meta description (140–160 chars ideal). Falls back to excerpt.
+     * Meta description for Google. 140–160 chars ideal. Falls back to excerpt.
      */
     metaDescription?: string | null;
     /**
-     * Comma-separated focus keywords
+     * Comma-separated focus keywords for this post.
      */
     keywords?: string | null;
     /**
-     * Hide this post from search engines
+     * Open Graph title for Facebook/LinkedIn shares. Falls back to metaTitle.
+     */
+    ogTitle?: string | null;
+    /**
+     * Open Graph description for social shares. Falls back to metaDescription.
+     */
+    ogDescription?: string | null;
+    /**
+     * Override the canonical URL (e.g. if content appears elsewhere first).
+     */
+    canonicalUrl?: string | null;
+    /**
+     * Hide this post from search engine crawlers.
      */
     noIndex?: boolean | null;
   };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Blog post categories for organization and SEO filtering.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories".
+ */
+export interface Category {
+  id: number;
+  name: string;
+  /**
+   * URL-friendly identifier (e.g. home-care-tips)
+   */
+  slug: string;
+  /**
+   * Short description shown on category pages and used for SEO.
+   */
+  description?: string | null;
+  /**
+   * Hex color for the category badge (e.g. #10b981)
+   */
+  color?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -460,6 +540,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'posts';
         value: number | Post;
+      } | null)
+    | ({
+        relationTo: 'categories';
+        value: number | Category;
       } | null)
     | ({
         relationTo: 'contact-submissions';
@@ -659,16 +743,41 @@ export interface PostsSelect<T extends boolean = true> {
   excerpt?: T;
   coverImage?: T;
   content?: T;
+  categories?: T;
+  tags?:
+    | T
+    | {
+        tag?: T;
+        id?: T;
+      };
+  status?: T;
   publishedAt?: T;
   author?: T;
+  featured?: T;
+  focusKeyphrase?: T;
   seo?:
     | T
     | {
         metaTitle?: T;
         metaDescription?: T;
         keywords?: T;
+        ogTitle?: T;
+        ogDescription?: T;
+        canonicalUrl?: T;
         noIndex?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories_select".
+ */
+export interface CategoriesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  description?: T;
+  color?: T;
   updatedAt?: T;
   createdAt?: T;
 }
