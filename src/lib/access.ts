@@ -1,4 +1,4 @@
-import type { Access, FieldAccess } from "payload";
+import type { Access, FieldAccess, Where } from "payload";
 
 type Role = "administrator" | "editor" | "author" | "contributor" | "subscriber";
 
@@ -23,13 +23,13 @@ export const isLoggedIn: Access = ({ req }) => Boolean(req.user);
 
 // Posts: public sees published only; authenticated sees based on role
 export const canReadPost: Access = ({ req: { user } }) => {
-  if (!user) return { status: { equals: "published" } };
+  if (!user) return { status: { equals: "published" } } as Where;
   const r = getRole(user);
   if (r === null || r === "administrator" || r === "editor") return true;
   if (r === "author" || r === "contributor") {
-    return { or: [{ status: { equals: "published" } }, { author: { equals: user.id } }] };
+    return { or: [{ status: { equals: "published" } }, { author: { equals: user.id } }] } as Where;
   }
-  return { status: { equals: "published" } };
+  return { status: { equals: "published" } } as Where;
 };
 
 export const canCreatePost: Access = check(["administrator", "editor", "author", "contributor"]);
@@ -39,7 +39,7 @@ export const canUpdatePost: Access = ({ req: { user } }) => {
   if (!user) return false;
   const r = getRole(user);
   if (r === null || r === "administrator" || r === "editor") return true;
-  if (r === "author" || r === "contributor") return { author: { equals: user.id } };
+  if (r === "author" || r === "contributor") return { author: { equals: user.id } } as Where;
   return false;
 };
 
@@ -48,7 +48,7 @@ export const canDeletePost: Access = ({ req: { user } }) => {
   if (!user) return false;
   const r = getRole(user);
   if (r === null || r === "administrator" || r === "editor") return true;
-  if (r === "author") return { author: { equals: user.id } };
+  if (r === "author") return { author: { equals: user.id } } as Where;
   return false;
 };
 

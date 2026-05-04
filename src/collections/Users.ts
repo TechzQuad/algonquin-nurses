@@ -1,4 +1,4 @@
-import type { CollectionConfig } from "payload";
+import type { CollectionConfig, Where } from "payload";
 import { isAdmin, isAdminField } from "@/lib/access";
 
 export const Users: CollectionConfig = {
@@ -13,7 +13,7 @@ export const Users: CollectionConfig = {
       if (!req.user) return false;
       const r = (req.user as { role?: string }).role ?? null;
       if (r === null || r === "administrator" || r === "editor") return true;
-      return { id: { equals: req.user.id } };
+      return { id: { equals: req.user.id } } as Where;
     },
     // Only admins can create new users (registration is admin-only)
     create: isAdmin,
@@ -22,7 +22,7 @@ export const Users: CollectionConfig = {
       if (!req.user) return false;
       const r = (req.user as { role?: string }).role ?? null;
       if (r === null || r === "administrator") return true;
-      return { id: { equals: req.user.id } };
+      return { id: { equals: req.user.id } } as Where;
     },
     delete: isAdmin,
   },
