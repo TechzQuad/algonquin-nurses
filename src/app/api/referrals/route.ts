@@ -39,6 +39,7 @@ export async function POST(request: Request) {
       where: { role: { equals: "administrator" } } as any,
       limit: 100,
       depth: 0,
+      overrideAccess: true,
     });
     const adminEmails = adminUsers.map((u) => (u as { email: string }).email).filter(Boolean);
 
