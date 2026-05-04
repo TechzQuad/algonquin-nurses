@@ -251,7 +251,7 @@ export function sendApplicationConfirmation(data: {
   });
 }
 
-export function sendContactNotification(data: {
+export async function sendContactNotification(data: {
   to: string[];
   firstName: string;
   lastName: string;
@@ -260,8 +260,11 @@ export function sendContactNotification(data: {
   service?: string;
   message: string;
 }) {
-  if (!process.env.RESEND_API_KEY || data.to.length === 0) return Promise.resolve();
-  return resend.emails.send({
+  if (!process.env.RESEND_API_KEY || data.to.length === 0) {
+    console.log("[resend] skipping contact notification — no API key or no recipients");
+    return;
+  }
+  const { data: result, error } = await resend.emails.send({
     from: FROM,
     to: data.to,
     subject: "Contact Form",
@@ -277,10 +280,12 @@ export function sendContactNotification(data: {
         row("Message", data.message),
       ].join(""),
     }),
-  }).catch((err) => console.error("Staff contact notification failed:", err));
+  });
+  if (error) console.error("[resend] contact notification error:", error);
+  else console.log("[resend] contact notification sent, id:", result?.id);
 }
 
-export function sendReferralNotification(data: {
+export async function sendReferralNotification(data: {
   to: string[];
   referrerName: string;
   referrerPhone: string;
@@ -290,8 +295,11 @@ export function sendReferralNotification(data: {
   service?: string;
   notes?: string;
 }) {
-  if (!process.env.RESEND_API_KEY || data.to.length === 0) return Promise.resolve();
-  return resend.emails.send({
+  if (!process.env.RESEND_API_KEY || data.to.length === 0) {
+    console.log("[resend] skipping referral notification — no API key or no recipients");
+    return;
+  }
+  const { data: result, error } = await resend.emails.send({
     from: FROM,
     to: data.to,
     subject: "Referral Form",
@@ -309,10 +317,12 @@ export function sendReferralNotification(data: {
         ...(data.notes ? [row("Notes", data.notes)] : []),
       ].join(""),
     }),
-  }).catch((err) => console.error("Staff referral notification failed:", err));
+  });
+  if (error) console.error("[resend] referral notification error:", error);
+  else console.log("[resend] referral notification sent, id:", result?.id);
 }
 
-export function sendApplicationNotification(data: {
+export async function sendApplicationNotification(data: {
   to: string[];
   firstName: string;
   lastName: string;
@@ -320,7 +330,10 @@ export function sendApplicationNotification(data: {
   phone: string;
   position?: string;
 }) {
-  if (!process.env.RESEND_API_KEY || data.to.length === 0) return Promise.resolve();
+  if (!process.env.RESEND_API_KEY || data.to.length === 0) {
+    console.log("[resend] skipping application notification — no API key or no recipients");
+    return;
+  }
   const POSITION_LABELS: Record<string, string> = {
     cna: "Certified Nursing Assistant (CNA)",
     hha: "Home Health Aide (HHA)",
@@ -328,7 +341,7 @@ export function sendApplicationNotification(data: {
     lpn: "Licensed Practical Nurse (LPN)",
     other: "Other",
   };
-  return resend.emails.send({
+  const { data: result, error } = await resend.emails.send({
     from: FROM,
     to: data.to,
     subject: "Career Form",
@@ -343,7 +356,9 @@ export function sendApplicationNotification(data: {
         ...(data.position ? [row("Position", POSITION_LABELS[data.position] ?? data.position)] : []),
       ].join(""),
     }),
-  }).catch((err) => console.error("Staff application notification failed:", err));
+  });
+  if (error) console.error("[resend] application notification error:", error);
+  else console.log("[resend] application notification sent, id:", result?.id);
 }
 
 export function sendChatLeadConfirmation(data: {
