@@ -357,7 +357,7 @@ export function sendContactConfirmation(data: {
     to: data.email,
     subject: "We received your message — Algonquin Nurses",
     firstName: data.firstName,
-    intro: "We've received your message and a member of our care team will be in touch within 1 business day. Here's a copy of what you submitted:",
+    intro: "We've received your message and a member of our care team will be in touch shortly. Here's a copy of what you submitted:",
     fields: [
       cField("Name", `${data.firstName} ${data.lastName}`),
       cField("Phone", data.phone),
@@ -432,7 +432,7 @@ export function sendChatLeadConfirmation(data: {
     to: data.email,
     subject: "We'll be in touch — Algonquin Nurses",
     firstName: data.name.split(" ")[0],
-    intro: "We received your information through our website chat and a member of our care team will contact you within 1 business day.",
+    intro: "We received your information through our website chat and a member of our care team will contact you shortly.",
     fields: [
       cField("Name", data.name),
       cField("Phone", data.phone),
