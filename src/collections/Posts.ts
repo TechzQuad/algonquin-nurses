@@ -1,6 +1,7 @@
 import type { CollectionConfig } from "payload";
 import { lexicalEditor, HorizontalRuleFeature } from "@payloadcms/richtext-lexical";
 import { enhanceBlogPost } from "@/lib/blogEnhancer";
+import { canReadPost, canCreatePost, canUpdatePost, canDeletePost } from "@/lib/access";
 
 // Module-level set prevents the afterChange hook from triggering itself
 // when it calls payload.update() to save the enhanced content.
@@ -27,10 +28,10 @@ export const Posts: CollectionConfig = {
     },
   },
   access: {
-    read: ({ req: { user } }) => {
-      if (user) return true;
-      return { status: { equals: "published" } };
-    },
+    read: canReadPost,
+    create: canCreatePost,
+    update: canUpdatePost,
+    delete: canDeletePost,
   },
   hooks: {
     beforeValidate: [
@@ -55,6 +56,14 @@ export const Posts: CollectionConfig = {
           !originalDoc?.publishedAt
         ) {
           data.publishedAt = new Date().toISOString();
+        }
+        return data;
+      },
+      // Contributors cannot publish — force status back to pending_review
+      ({ data, req }) => {
+        const role = (req.user as { role?: string } | null)?.role;
+        if (role === "contributor" && data?.status === "published") {
+          data.status = "pending_review";
         }
         return data;
       },

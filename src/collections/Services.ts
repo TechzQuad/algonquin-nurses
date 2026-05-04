@@ -1,5 +1,6 @@
 import type { CollectionConfig } from "payload";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
+import { isAdminOrEditor } from "@/lib/access";
 
 export const Services: CollectionConfig = {
   slug: "services",
@@ -9,6 +10,9 @@ export const Services: CollectionConfig = {
   },
   access: {
     read: () => true,
+    create: isAdminOrEditor,
+    update: isAdminOrEditor,
+    delete: isAdminOrEditor,
   },
   fields: [
     {

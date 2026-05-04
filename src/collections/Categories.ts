@@ -1,4 +1,5 @@
 import type { CollectionConfig } from "payload";
+import { isAdminOrEditor } from "@/lib/access";
 
 export const Categories: CollectionConfig = {
   slug: "categories",
@@ -7,7 +8,7 @@ export const Categories: CollectionConfig = {
     defaultColumns: ["name", "slug", "description"],
     description: "Blog post categories for organization and SEO filtering.",
   },
-  access: { read: () => true },
+  access: { read: () => true, create: isAdminOrEditor, update: isAdminOrEditor, delete: isAdminOrEditor },
   fields: [
     {
       name: "name",

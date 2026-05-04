@@ -1,4 +1,5 @@
 import type { CollectionConfig } from "payload";
+import { isAdminOrEditor } from "@/lib/access";
 
 export const Team: CollectionConfig = {
   slug: "team",
@@ -8,6 +9,9 @@ export const Team: CollectionConfig = {
   },
   access: {
     read: () => true,
+    create: isAdminOrEditor,
+    update: isAdminOrEditor,
+    delete: isAdminOrEditor,
   },
   fields: [
     {

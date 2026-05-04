@@ -1,4 +1,5 @@
 import type { CollectionConfig } from "payload";
+import { isAdminOrEditor } from "@/lib/access";
 
 export const Feedback: CollectionConfig = {
   slug: "feedback",
@@ -9,10 +10,10 @@ export const Feedback: CollectionConfig = {
     group: "Submissions",
   },
   access: {
-    read: ({ req }) => Boolean(req.user),
+    read: isAdminOrEditor,
     create: () => false,
-    update: ({ req }) => Boolean(req.user),
-    delete: ({ req }) => Boolean(req.user),
+    update: isAdminOrEditor,
+    delete: isAdminOrEditor,
   },
   fields: [
     { name: "name", type: "text" },
