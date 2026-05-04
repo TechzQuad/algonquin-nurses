@@ -4,121 +4,238 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 const FROM = process.env.RESEND_FROM_EMAIL ?? "Algonquin Nurses <onboarding@resend.dev>";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.algonquinnurses.com";
-const LOGO_URL = `${SITE_URL}/images/algonquin-logo-top-300.png`;
+// Always use the production domain for logo so email clients can load it
+const LOGO_URL = "https://www.algonquinnurses.com/images/algonquin-logo-top-300.png";
+const ADMIN_URL = `${SITE_URL}/admin`;
 const YEAR = new Date().getFullYear();
 
-function row(label: string, value: string) {
-  return `<tr>
-    <td style="padding:6px 0;font-size:14px;color:#6b7280;width:160px;vertical-align:top;">${label}</td>
-    <td style="padding:6px 0;font-size:14px;color:#111827;font-weight:500;">${value}</td>
+const SERVICE_LABELS: Record<string, string> = {
+  "private-duty": "Private Duty Care",
+  medicaid: "Medicaid In-Home Care",
+  cds: "Consumer Directed Services",
+  hcy: "Healthy Youth & Children Program",
+  veterans: "Veterans Care",
+  other: "Other",
+};
+
+const POSITION_LABELS: Record<string, string> = {
+  cna: "Certified Nursing Assistant (CNA)",
+  hha: "Home Health Aide (HHA)",
+  rn: "Registered Nurse (RN)",
+  lpn: "Licensed Practical Nurse (LPN)",
+  other: "Other",
+};
+
+// ─── Confirmation template (sent to the person who submitted) ─────────────────
+
+function field(label: string, value: string) {
+  return `
+  <tr>
+    <td style="padding:12px 0;border-bottom:1px solid #f1f5f9;">
+      <span style="display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:3px;">${label}</span>
+      <span style="font-size:15px;color:#1e293b;font-weight:500;">${value}</span>
+    </td>
   </tr>`;
 }
 
-function buildEmailHtml({
+function buildConfirmationHtml({
   subject,
-  greeting,
+  firstName,
   intro,
-  tableRows,
+  fields,
   note,
   ctaLabel,
   ctaHref,
 }: {
   subject: string;
-  greeting: string;
+  firstName: string;
   intro: string;
-  tableRows?: string;
+  fields: string;
   note?: string;
   ctaLabel?: string;
   ctaHref?: string;
 }) {
-  const ctaBlock =
-    ctaLabel && ctaHref
-      ? `<tr><td style="padding:28px 40px 0;text-align:center;">
-           <a href="${SITE_URL}${ctaHref}"
-              style="display:inline-block;background-color:#3b5d95;color:#ffffff;text-decoration:none;
-                     font-size:15px;font-weight:600;padding:14px 32px;border-radius:8px;letter-spacing:0.01em;">
-             ${ctaLabel}
-           </a>
-         </td></tr>`
-      : "";
-
-  const tableBlock = tableRows
-    ? `<table cellpadding="0" cellspacing="0" width="100%"
-             style="margin-top:20px;border-top:1px solid #e5e7eb;padding-top:16px;">
-         ${tableRows}
-       </table>`
+  const cta = ctaLabel && ctaHref
+    ? `<div style="text-align:center;margin-top:32px;">
+        <a href="${SITE_URL}${ctaHref}"
+           style="display:inline-block;background-color:#3b5d95;color:#ffffff;text-decoration:none;
+                  font-size:14px;font-weight:600;padding:14px 36px;border-radius:50px;
+                  letter-spacing:0.02em;">
+          ${ctaLabel} &rarr;
+        </a>
+       </div>`
     : "";
 
-  const noteBlock = note
-    ? `<p style="margin:24px 0 0;font-size:13px;color:#9ca3af;line-height:1.6;">${note}</p>`
+  const noteHtml = note
+    ? `<p style="margin:28px 0 0;padding:16px 20px;background:#f0f7ff;border-left:3px solid #3b5d95;border-radius:4px;font-size:13px;color:#475569;line-height:1.6;">${note}</p>`
     : "";
 
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>${subject}</title>
 </head>
-<body style="margin:0;padding:0;background-color:#f0f4f8;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f0f4f8;padding:40px 20px;">
+<body style="margin:0;padding:0;background-color:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#f1f5f9;padding:40px 16px;">
     <tr><td align="center">
-      <table width="600" cellpadding="0" cellspacing="0"
-             style="max-width:600px;background-color:#ffffff;border-radius:16px;
-                    overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.09);">
+      <table width="560" cellpadding="0" cellspacing="0" role="presentation" style="max-width:560px;width:100%;">
 
-        <!-- Header -->
+        <!-- Logo bar -->
         <tr>
-          <td style="background-color:#3b5d95;padding:30px 40px;text-align:center;">
-            <img src="${LOGO_URL}" alt="Algonquin Nurses Home Health Care"
-                 style="max-width:190px;height:auto;display:block;margin:0 auto;" />
+          <td style="padding-bottom:24px;text-align:center;">
+            <img src="${LOGO_URL}" alt="Algonquin Nurses Home Health Care" width="160" style="display:inline-block;height:auto;"/>
           </td>
         </tr>
 
-        <!-- Accent bar -->
+        <!-- Card -->
         <tr>
-          <td style="height:4px;background:linear-gradient(90deg,#3b5d95 0%,#839fce 100%);"></td>
-        </tr>
+          <td style="background:#ffffff;border-radius:16px;box-shadow:0 2px 16px rgba(15,23,42,0.08);overflow:hidden;">
 
-        <!-- Body -->
-        <tr>
-          <td style="padding:40px 40px 32px;">
-            <h1 style="margin:0 0 10px;font-size:22px;color:#1a2e50;font-weight:700;line-height:1.3;">
-              ${greeting}
-            </h1>
-            <p style="margin:0;font-size:15px;color:#4b5563;line-height:1.7;">${intro}</p>
-            ${tableBlock}
-            ${noteBlock}
+            <!-- Blue header strip -->
+            <div style="background:linear-gradient(135deg,#1a2e50 0%,#3b5d95 100%);padding:32px 40px;">
+              <p style="margin:0 0 6px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:#93c5fd;">Message Received</p>
+              <h1 style="margin:0;font-size:24px;color:#ffffff;font-weight:700;line-height:1.2;">Hi ${firstName}, we got your message!</h1>
+            </div>
+
+            <!-- Body -->
+            <div style="padding:36px 40px;">
+              <p style="margin:0 0 24px;font-size:15px;color:#475569;line-height:1.7;">${intro}</p>
+
+              <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                ${fields}
+              </table>
+
+              ${noteHtml}
+              ${cta}
+            </div>
+
+            <!-- Footer -->
+            <div style="background:#f8fafc;border-top:1px solid #e2e8f0;padding:24px 40px;text-align:center;">
+              <p style="margin:0 0 8px;font-size:13px;font-weight:700;color:#3b5d95;">Algonquin Nurses Home Health Care</p>
+              <p style="margin:0 0 8px;font-size:12px;color:#94a3b8;">Serving St. Louis Metro with Compassionate Care Since 1987</p>
+              <p style="margin:0 0 16px;font-size:12px;color:#64748b;line-height:2;">
+                <a href="tel:3148228158" style="color:#3b5d95;text-decoration:none;">(314) 822-8158</a>
+                &nbsp;&bull;&nbsp;
+                <a href="tel:6362741870" style="color:#3b5d95;text-decoration:none;">(636) 274-1870</a>
+                &nbsp;&bull;&nbsp;
+                <a href="tel:6369781775" style="color:#3b5d95;text-decoration:none;">(636) 978-1775</a>
+              </p>
+              <p style="margin:0;font-size:11px;color:#cbd5e1;">&copy; ${YEAR} Algonquin Nurses Home Health Care. All rights reserved.</p>
+            </div>
+
           </td>
         </tr>
 
-        ${ctaBlock}
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+}
 
-        <!-- Divider -->
+// ─── Notification template (sent to admin staff) ──────────────────────────────
+
+const BADGE_COLORS: Record<string, string> = {
+  "Contact Form":  "#0ea5e9",
+  "Referral Form": "#8b5cf6",
+  "Career Form":   "#f59e0b",
+};
+
+function notifField(label: string, value: string, last = false) {
+  return `
+  <tr>
+    <td width="140" valign="top" style="padding:14px 16px 14px 0;${last ? "" : "border-bottom:1px solid #f1f5f9;"}">
+      <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#94a3b8;">${label}</span>
+    </td>
+    <td valign="top" style="padding:14px 0;${last ? "" : "border-bottom:1px solid #f1f5f9;"}">
+      <span style="font-size:14px;color:#1e293b;font-weight:500;line-height:1.5;">${value}</span>
+    </td>
+  </tr>`;
+}
+
+function buildNotificationHtml(formType: string, fieldsHtml: string) {
+  const badgeColor = BADGE_COLORS[formType] ?? "#3b5d95";
+  const timestamp = new Date().toLocaleString("en-US", {
+    weekday: "short", month: "short", day: "numeric",
+    year: "numeric", hour: "numeric", minute: "2-digit",
+    timeZoneName: "short",
+  });
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>${formType} Submission</title>
+</head>
+<body style="margin:0;padding:0;background-color:#0f172a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#0f172a;padding:40px 16px;">
+    <tr><td align="center">
+      <table width="580" cellpadding="0" cellspacing="0" role="presentation" style="max-width:580px;width:100%;">
+
+        <!-- Top bar with logo -->
         <tr>
-          <td style="padding:32px 40px 0;">
-            <hr style="border:none;border-top:1px solid #e5e7eb;margin:0;" />
+          <td style="padding-bottom:28px;">
+            <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+              <tr>
+                <td>
+                  <img src="${LOGO_URL}" alt="Algonquin Nurses" width="130" style="display:block;height:auto;"/>
+                </td>
+                <td align="right" valign="middle">
+                  <span style="display:inline-block;background:${badgeColor};color:#ffffff;font-size:11px;font-weight:700;
+                               text-transform:uppercase;letter-spacing:0.08em;padding:5px 14px;border-radius:50px;">
+                    ${formType}
+                  </span>
+                </td>
+              </tr>
+            </table>
           </td>
         </tr>
 
-        <!-- Footer -->
+        <!-- Main card -->
         <tr>
-          <td style="padding:28px 40px 36px;text-align:center;">
-            <p style="margin:0 0 6px;font-size:14px;font-weight:700;color:#3b5d95;">
-              Algonquin Nurses Home Health Care
-            </p>
-            <p style="margin:0 0 6px;font-size:13px;color:#6b7280;">
-              Serving St. Louis Metro with Compassionate Care Since 1987
-            </p>
-            <p style="margin:0 0 16px;font-size:13px;color:#6b7280;line-height:1.8;">
-              St. Louis: <a href="tel:3148228158" style="color:#3b5d95;text-decoration:none;">(314) 822-8158</a>
-              &nbsp;&middot;&nbsp;
-              House Springs: <a href="tel:6362741870" style="color:#3b5d95;text-decoration:none;">(636) 274-1870</a>
-              &nbsp;&middot;&nbsp;
-              O'Fallon: <a href="tel:6369781775" style="color:#3b5d95;text-decoration:none;">(636) 978-1775</a>
-            </p>
-            <p style="margin:0;font-size:12px;color:#9ca3af;">
-              &copy; ${YEAR} Algonquin Nurses Home Health Care. All rights reserved.
+          <td style="background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 32px rgba(0,0,0,0.3);">
+
+            <!-- Colored top accent -->
+            <div style="height:4px;background:linear-gradient(90deg,${badgeColor} 0%,${badgeColor}88 100%);"></div>
+
+            <!-- Header -->
+            <div style="padding:28px 36px 20px;">
+              <h1 style="margin:0 0 6px;font-size:20px;font-weight:700;color:#0f172a;">New ${formType} Submission</h1>
+              <p style="margin:0;font-size:12px;color:#94a3b8;">Received ${timestamp}</p>
+            </div>
+
+            <!-- Divider -->
+            <div style="height:1px;background:#f1f5f9;margin:0 36px;"></div>
+
+            <!-- Fields -->
+            <div style="padding:8px 36px 24px;">
+              <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                ${fieldsHtml}
+              </table>
+            </div>
+
+            <!-- CTA -->
+            <div style="padding:20px 36px 32px;text-align:center;">
+              <a href="${ADMIN_URL}"
+                 style="display:inline-block;background:#0f172a;color:#ffffff;text-decoration:none;
+                        font-size:13px;font-weight:600;padding:12px 32px;border-radius:50px;
+                        letter-spacing:0.02em;">
+                View in Admin Panel &rarr;
+              </a>
+            </div>
+
+          </td>
+        </tr>
+
+        <!-- Footer note -->
+        <tr>
+          <td style="padding-top:20px;text-align:center;">
+            <p style="margin:0;font-size:11px;color:#475569;">
+              This is an automated notification from <a href="${SITE_URL}" style="color:#94a3b8;">algonquinnurses.com</a>.
+              Only administrators receive this email.
             </p>
           </td>
         </tr>
@@ -130,39 +247,29 @@ function buildEmailHtml({
 </html>`;
 }
 
+// ─── Shared sendEmail for confirmations ───────────────────────────────────────
+
 export async function sendEmail(opts: {
   to: string;
   subject: string;
-  greeting: string;
+  firstName: string;
   intro: string;
-  tableRows?: string;
+  fields: string;
   note?: string;
   ctaLabel?: string;
   ctaHref?: string;
 }) {
   if (!process.env.RESEND_API_KEY) return;
-  try {
-    await resend.emails.send({
-      from: FROM,
-      to: [opts.to],
-      subject: opts.subject,
-      html: buildEmailHtml(opts),
-    });
-  } catch (err) {
-    console.error("Email delivery failed:", err);
-  }
+  const { error } = await resend.emails.send({
+    from: FROM,
+    to: [opts.to],
+    subject: opts.subject,
+    html: buildConfirmationHtml(opts),
+  });
+  if (error) console.error("[resend] confirmation error:", error);
 }
 
-// ─── Template helpers ────────────────────────────────────────────────────────
-
-const SERVICE_LABELS: Record<string, string> = {
-  "private-duty": "Private Duty Care",
-  medicaid: "Medicaid In-Home Care",
-  cds: "Consumer Directed Services",
-  hcy: "Healthy Youth & Children Program",
-  veterans: "Veterans Care",
-  other: "Other",
-};
+// ─── Confirmation emails (to submitter) ───────────────────────────────────────
 
 export function sendContactConfirmation(data: {
   email: string;
@@ -175,16 +282,15 @@ export function sendContactConfirmation(data: {
   return sendEmail({
     to: data.email,
     subject: "We received your message — Algonquin Nurses",
-    greeting: `Thank you, ${data.firstName}!`,
-    intro:
-      "We've received your message and a member of our care team will be in touch with you within 1 business day. Here's a summary of your submission:",
-    tableRows: [
-      row("Name", `${data.firstName} ${data.lastName}`),
-      row("Phone", data.phone),
-      ...(data.service ? [row("Service of Interest", SERVICE_LABELS[data.service] ?? data.service)] : []),
-      row("Message", data.message),
+    firstName: data.firstName,
+    intro: "We've received your message and a member of our care team will be in touch within 1 business day. Here's a copy of what you submitted:",
+    fields: [
+      field("Name", `${data.firstName} ${data.lastName}`),
+      field("Phone", data.phone),
+      ...(data.service ? [field("Service of Interest", SERVICE_LABELS[data.service] ?? data.service)] : []),
+      field("Message", data.message),
     ].join(""),
-    note: "Need immediate assistance? Call us at <strong>(636) 274-1870</strong> anytime.",
+    note: "Need immediate assistance? Call us at <strong>(636) 274-1870</strong> — we're available 24/7.",
     ctaLabel: "Visit Our Website",
     ctaHref: "/",
   });
@@ -203,16 +309,15 @@ export function sendReferralConfirmation(data: {
   return sendEmail({
     to: data.referrerEmail,
     subject: "Referral received — Algonquin Nurses",
-    greeting: `Thank you for your referral, ${data.referrerName.split(" ")[0]}!`,
-    intro:
-      "We've received your client referral and will reach out to them promptly. Here's a summary:",
-    tableRows: [
-      row("Your Name", data.referrerName),
-      row("Your Phone", data.referrerPhone),
-      row("Client Name", data.clientName),
-      ...(data.clientPhone ? [row("Client Phone", data.clientPhone)] : []),
-      ...(data.service ? [row("Service", SERVICE_LABELS[data.service] ?? data.service)] : []),
-      ...(data.notes ? [row("Notes", data.notes)] : []),
+    firstName: data.referrerName.split(" ")[0],
+    intro: "We've received your client referral and will reach out to them promptly. Here's a summary of what you submitted:",
+    fields: [
+      field("Your Name", data.referrerName),
+      field("Your Phone", data.referrerPhone),
+      field("Client Name", data.clientName),
+      ...(data.clientPhone ? [field("Client Phone", data.clientPhone)] : []),
+      ...(data.service ? [field("Service", SERVICE_LABELS[data.service] ?? data.service)] : []),
+      ...(data.notes ? [field("Notes", data.notes)] : []),
     ].join(""),
     note: "Questions? Call us at <strong>(636) 274-1870</strong>.",
     ctaLabel: "View Our Services",
@@ -227,138 +332,20 @@ export function sendApplicationConfirmation(data: {
   phone: string;
   position?: string;
 }) {
-  const POSITION_LABELS: Record<string, string> = {
-    cna: "Certified Nursing Assistant (CNA)",
-    hha: "Home Health Aide (HHA)",
-    rn: "Registered Nurse (RN)",
-    lpn: "Licensed Practical Nurse (LPN)",
-    other: "Other",
-  };
   return sendEmail({
     to: data.email,
     subject: "Application received — Algonquin Nurses",
-    greeting: `Thank you for applying, ${data.firstName}!`,
-    intro:
-      "We've received your job application and our hiring team will review it shortly. We'll be in touch if your qualifications are a match. Here's a summary:",
-    tableRows: [
-      row("Name", `${data.firstName} ${data.lastName}`),
-      row("Phone", data.phone),
-      ...(data.position ? [row("Position", POSITION_LABELS[data.position] ?? data.position)] : []),
+    firstName: data.firstName,
+    intro: "We've received your job application and our hiring team will review it shortly. We'll be in touch if your qualifications are a match.",
+    fields: [
+      field("Name", `${data.firstName} ${data.lastName}`),
+      field("Phone", data.phone),
+      ...(data.position ? [field("Position", POSITION_LABELS[data.position] ?? data.position)] : []),
     ].join(""),
     note: "Questions about your application? Call us at <strong>(636) 274-1870</strong>.",
     ctaLabel: "View Open Positions",
     ctaHref: "/careers",
   });
-}
-
-export async function sendContactNotification(data: {
-  to: string[];
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  service?: string;
-  message: string;
-}) {
-  if (!process.env.RESEND_API_KEY || data.to.length === 0) {
-    console.log("[resend] skipping contact notification — no API key or no recipients");
-    return;
-  }
-  const { data: result, error } = await resend.emails.send({
-    from: FROM,
-    to: data.to,
-    subject: "Contact Form",
-    html: buildEmailHtml({
-      subject: "Contact Form",
-      greeting: "New Contact Form Submission",
-      intro: "A visitor submitted the contact form on the website.",
-      tableRows: [
-        row("Name", `${data.firstName} ${data.lastName}`),
-        row("Email", data.email),
-        row("Phone", data.phone),
-        ...(data.service ? [row("Service of Interest", SERVICE_LABELS[data.service] ?? data.service)] : []),
-        row("Message", data.message),
-      ].join(""),
-    }),
-  });
-  if (error) console.error("[resend] contact notification error:", error);
-  else console.log("[resend] contact notification sent, id:", result?.id);
-}
-
-export async function sendReferralNotification(data: {
-  to: string[];
-  referrerName: string;
-  referrerPhone: string;
-  referrerEmail?: string;
-  clientName: string;
-  clientPhone?: string;
-  service?: string;
-  notes?: string;
-}) {
-  if (!process.env.RESEND_API_KEY || data.to.length === 0) {
-    console.log("[resend] skipping referral notification — no API key or no recipients");
-    return;
-  }
-  const { data: result, error } = await resend.emails.send({
-    from: FROM,
-    to: data.to,
-    subject: "Referral Form",
-    html: buildEmailHtml({
-      subject: "Referral Form",
-      greeting: "New Client Referral Submission",
-      intro: "A referral was submitted through the website.",
-      tableRows: [
-        row("Referrer Name", data.referrerName),
-        row("Referrer Phone", data.referrerPhone),
-        ...(data.referrerEmail ? [row("Referrer Email", data.referrerEmail)] : []),
-        row("Client Name", data.clientName),
-        ...(data.clientPhone ? [row("Client Phone", data.clientPhone)] : []),
-        ...(data.service ? [row("Service", SERVICE_LABELS[data.service] ?? data.service)] : []),
-        ...(data.notes ? [row("Notes", data.notes)] : []),
-      ].join(""),
-    }),
-  });
-  if (error) console.error("[resend] referral notification error:", error);
-  else console.log("[resend] referral notification sent, id:", result?.id);
-}
-
-export async function sendApplicationNotification(data: {
-  to: string[];
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  position?: string;
-}) {
-  if (!process.env.RESEND_API_KEY || data.to.length === 0) {
-    console.log("[resend] skipping application notification — no API key or no recipients");
-    return;
-  }
-  const POSITION_LABELS: Record<string, string> = {
-    cna: "Certified Nursing Assistant (CNA)",
-    hha: "Home Health Aide (HHA)",
-    rn: "Registered Nurse (RN)",
-    lpn: "Licensed Practical Nurse (LPN)",
-    other: "Other",
-  };
-  const { data: result, error } = await resend.emails.send({
-    from: FROM,
-    to: data.to,
-    subject: "Career Form",
-    html: buildEmailHtml({
-      subject: "Career Form",
-      greeting: "New Job Application Submission",
-      intro: "A candidate submitted a job application through the website.",
-      tableRows: [
-        row("Name", `${data.firstName} ${data.lastName}`),
-        row("Email", data.email),
-        row("Phone", data.phone),
-        ...(data.position ? [row("Position", POSITION_LABELS[data.position] ?? data.position)] : []),
-      ].join(""),
-    }),
-  });
-  if (error) console.error("[resend] application notification error:", error);
-  else console.log("[resend] application notification sent, id:", result?.id);
 }
 
 export function sendChatLeadConfirmation(data: {
@@ -370,16 +357,90 @@ export function sendChatLeadConfirmation(data: {
   return sendEmail({
     to: data.email,
     subject: "We'll be in touch — Algonquin Nurses",
-    greeting: `Thanks for reaching out, ${data.name.split(" ")[0]}!`,
-    intro:
-      "We received your information through our website chat and a member of our care team will contact you within 1 business day.",
-    tableRows: [
-      row("Name", data.name),
-      row("Phone", data.phone),
-      ...(data.service ? [row("Service of Interest", SERVICE_LABELS[data.service] ?? data.service)] : []),
+    firstName: data.name.split(" ")[0],
+    intro: "We received your information through our website chat and a member of our care team will contact you within 1 business day.",
+    fields: [
+      field("Name", data.name),
+      field("Phone", data.phone),
+      ...(data.service ? [field("Service of Interest", SERVICE_LABELS[data.service] ?? data.service)] : []),
     ].join(""),
     note: "Can't wait? Call us now at <strong>(636) 274-1870</strong> — we're available 24/7.",
     ctaLabel: "Explore Our Services",
     ctaHref: "/services/private-duty-care",
   });
+}
+
+// ─── Notification emails (to admin staff) ────────────────────────────────────
+
+async function sendNotification(to: string[], subject: string, formType: string, fieldsHtml: string) {
+  if (!process.env.RESEND_API_KEY || to.length === 0) {
+    console.log(`[resend] skipping ${formType} notification — no API key or no recipients`);
+    return;
+  }
+  const { data, error } = await resend.emails.send({
+    from: FROM,
+    to,
+    subject,
+    html: buildNotificationHtml(formType, fieldsHtml),
+  });
+  if (error) console.error(`[resend] ${formType} notification error:`, error);
+  else console.log(`[resend] ${formType} notification sent, id:`, data?.id);
+}
+
+export function sendContactNotification(data: {
+  to: string[];
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  service?: string;
+  message: string;
+}) {
+  const fields = [
+    notifField("Name", `${data.firstName} ${data.lastName}`),
+    notifField("Email", `<a href="mailto:${data.email}" style="color:#3b5d95;text-decoration:none;">${data.email}</a>`),
+    notifField("Phone", `<a href="tel:${data.phone.replace(/\D/g, "")}" style="color:#3b5d95;text-decoration:none;">${data.phone}</a>`),
+    ...(data.service ? [notifField("Service", SERVICE_LABELS[data.service] ?? data.service)] : []),
+    notifField("Message", data.message, true),
+  ].join("");
+  return sendNotification(data.to, "Contact Form", "Contact Form", fields);
+}
+
+export function sendReferralNotification(data: {
+  to: string[];
+  referrerName: string;
+  referrerPhone: string;
+  referrerEmail?: string;
+  clientName: string;
+  clientPhone?: string;
+  service?: string;
+  notes?: string;
+}) {
+  const allFields = [
+    notifField("Referrer Name", data.referrerName),
+    ...(data.referrerEmail ? [notifField("Referrer Email", `<a href="mailto:${data.referrerEmail}" style="color:#3b5d95;text-decoration:none;">${data.referrerEmail}</a>`)] : []),
+    notifField("Referrer Phone", `<a href="tel:${data.referrerPhone.replace(/\D/g, "")}" style="color:#3b5d95;text-decoration:none;">${data.referrerPhone}</a>`),
+    notifField("Client Name", data.clientName),
+    ...(data.clientPhone ? [notifField("Client Phone", `<a href="tel:${data.clientPhone.replace(/\D/g, "")}" style="color:#3b5d95;text-decoration:none;">${data.clientPhone}</a>`)] : []),
+    ...(data.service ? [notifField("Service", SERVICE_LABELS[data.service] ?? data.service)] : []),
+    ...(data.notes ? [notifField("Notes", data.notes, true)] : [notifField("Notes", "—", true)]),
+  ].join("");
+  return sendNotification(data.to, "Referral Form", "Referral Form", allFields);
+}
+
+export function sendApplicationNotification(data: {
+  to: string[];
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  position?: string;
+}) {
+  const allFields = [
+    notifField("Name", `${data.firstName} ${data.lastName}`),
+    notifField("Email", `<a href="mailto:${data.email}" style="color:#3b5d95;text-decoration:none;">${data.email}</a>`),
+    notifField("Phone", `<a href="tel:${data.phone.replace(/\D/g, "")}" style="color:#3b5d95;text-decoration:none;">${data.phone}</a>`),
+    notifField("Position", data.position ? (POSITION_LABELS[data.position] ?? data.position) : "—", true),
+  ].join("");
+  return sendNotification(data.to, "Career Form", "Career Form", allFields);
 }
