@@ -2,7 +2,7 @@ import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-const FROM = "Algonquin Nurses <noreply@algonquinnurses.com>";
+const FROM = process.env.RESEND_FROM_EMAIL ?? "Algonquin Nurses <onboarding@resend.dev>";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.algonquinnurses.com";
 const LOGO_URL = `${SITE_URL}/images/algonquin-logo-top-300.png`;
 const YEAR = new Date().getFullYear();
