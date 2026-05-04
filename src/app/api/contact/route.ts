@@ -40,8 +40,9 @@ export async function POST(request: Request) {
       overrideAccess: true,
     });
     const adminEmails = adminUsers.map((u) => (u as { email: string }).email).filter(Boolean);
+    console.log("[contact] admin users found:", adminUsers.length, "| emails:", adminEmails);
 
-    await Promise.all([
+    const [confirmResult, notifResult] = await Promise.allSettled([
       sendContactConfirmation({
         email: String(email),
         firstName: String(firstName),
@@ -60,6 +61,8 @@ export async function POST(request: Request) {
         message: String(message),
       }),
     ]);
+    if (confirmResult.status === "rejected") console.error("[contact] confirmation email failed:", confirmResult.reason);
+    if (notifResult.status === "rejected") console.error("[contact] notification email failed:", notifResult.reason);
 
     return NextResponse.json({ ok: true });
   } catch (err) {
