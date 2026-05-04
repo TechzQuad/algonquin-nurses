@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getPayloadClient } from "@/lib/payload";
-import { sendReferralConfirmation } from "@/lib/email";
+import { sendReferralConfirmation, sendReferralNotification } from "@/lib/email";
 
 export const runtime = "nodejs";
 
@@ -33,15 +33,26 @@ export async function POST(request: Request) {
       },
     });
 
-    await sendReferralConfirmation({
-      referrerEmail: referrerEmail ? String(referrerEmail) : undefined,
-      referrerName: String(referrerName),
-      referrerPhone: String(referrerPhone),
-      clientName: String(clientName),
-      clientPhone: clientPhone ? String(clientPhone) : undefined,
-      service: service ? String(service) : undefined,
-      notes: notes ? String(notes) : undefined,
-    });
+    await Promise.all([
+      sendReferralConfirmation({
+        referrerEmail: referrerEmail ? String(referrerEmail) : undefined,
+        referrerName: String(referrerName),
+        referrerPhone: String(referrerPhone),
+        clientName: String(clientName),
+        clientPhone: clientPhone ? String(clientPhone) : undefined,
+        service: service ? String(service) : undefined,
+        notes: notes ? String(notes) : undefined,
+      }),
+      sendReferralNotification({
+        referrerName: String(referrerName),
+        referrerPhone: String(referrerPhone),
+        referrerEmail: referrerEmail ? String(referrerEmail) : undefined,
+        clientName: String(clientName),
+        clientPhone: clientPhone ? String(clientPhone) : undefined,
+        service: service ? String(service) : undefined,
+        notes: notes ? String(notes) : undefined,
+      }),
+    ]);
 
     return NextResponse.json({ ok: true });
   } catch (err) {

@@ -3,6 +3,13 @@ import { Resend } from "resend";
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const FROM = "Algonquin Nurses <noreply@algonquinnurses.com>";
+const STAFF_EMAILS = [
+  "romeo@wyzdigital.com",
+  "dsmith@wyzdigital.com",
+  "rpeters@algonquinnurses.com",
+  "rbilzing@algonquinnurses.com",
+  "cmansfield@algonquinnurses.com",
+];
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.algonquinnurses.com";
 const LOGO_URL = `${SITE_URL}/images/algonquin-logo-top-300.png`;
 const YEAR = new Date().getFullYear();
@@ -249,6 +256,65 @@ export function sendApplicationConfirmation(data: {
     ctaLabel: "View Open Positions",
     ctaHref: "/careers",
   });
+}
+
+export function sendContactNotification(data: {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  service?: string;
+  message: string;
+}) {
+  if (!process.env.RESEND_API_KEY) return Promise.resolve();
+  return resend.emails.send({
+    from: FROM,
+    to: STAFF_EMAILS,
+    subject: "Contact Form",
+    html: buildEmailHtml({
+      subject: "Contact Form",
+      greeting: "New Contact Form Submission",
+      intro: "A visitor submitted the contact form on the website.",
+      tableRows: [
+        row("Name", `${data.firstName} ${data.lastName}`),
+        row("Email", data.email),
+        row("Phone", data.phone),
+        ...(data.service ? [row("Service of Interest", SERVICE_LABELS[data.service] ?? data.service)] : []),
+        row("Message", data.message),
+      ].join(""),
+    }),
+  }).catch((err) => console.error("Staff contact notification failed:", err));
+}
+
+export function sendReferralNotification(data: {
+  referrerName: string;
+  referrerPhone: string;
+  referrerEmail?: string;
+  clientName: string;
+  clientPhone?: string;
+  service?: string;
+  notes?: string;
+}) {
+  if (!process.env.RESEND_API_KEY) return Promise.resolve();
+  return resend.emails.send({
+    from: FROM,
+    to: STAFF_EMAILS,
+    subject: "Referral Form",
+    html: buildEmailHtml({
+      subject: "Referral Form",
+      greeting: "New Client Referral Submission",
+      intro: "A referral was submitted through the website.",
+      tableRows: [
+        row("Referrer Name", data.referrerName),
+        row("Referrer Phone", data.referrerPhone),
+        ...(data.referrerEmail ? [row("Referrer Email", data.referrerEmail)] : []),
+        row("Client Name", data.clientName),
+        ...(data.clientPhone ? [row("Client Phone", data.clientPhone)] : []),
+        ...(data.service ? [row("Service", SERVICE_LABELS[data.service] ?? data.service)] : []),
+        ...(data.notes ? [row("Notes", data.notes)] : []),
+      ].join(""),
+    }),
+  }).catch((err) => console.error("Staff referral notification failed:", err));
 }
 
 export function sendChatLeadConfirmation(data: {

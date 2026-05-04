@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getPayloadClient } from "@/lib/payload";
-import { sendContactConfirmation } from "@/lib/email";
+import { sendContactConfirmation, sendContactNotification } from "@/lib/email";
 
 export const runtime = "nodejs";
 
@@ -31,14 +31,24 @@ export async function POST(request: Request) {
       },
     });
 
-    await sendContactConfirmation({
-      email: String(email),
-      firstName: String(firstName),
-      lastName: String(lastName),
-      phone: String(phone),
-      service: service ? String(service) : undefined,
-      message: String(message),
-    });
+    await Promise.all([
+      sendContactConfirmation({
+        email: String(email),
+        firstName: String(firstName),
+        lastName: String(lastName),
+        phone: String(phone),
+        service: service ? String(service) : undefined,
+        message: String(message),
+      }),
+      sendContactNotification({
+        firstName: String(firstName),
+        lastName: String(lastName),
+        email: String(email),
+        phone: String(phone),
+        service: service ? String(service) : undefined,
+        message: String(message),
+      }),
+    ]);
 
     return NextResponse.json({ ok: true });
   } catch (err) {
