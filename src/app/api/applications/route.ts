@@ -60,6 +60,15 @@ export async function POST(request: Request) {
       },
     });
 
+    const { docs: adminUsers } = await payload.find({
+      collection: "users",
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      where: { role: { equals: "administrator" } } as any,
+      limit: 100,
+      depth: 0,
+    });
+    const adminEmails = adminUsers.map((u) => (u as { email: string }).email).filter(Boolean);
+
     await Promise.all([
       sendApplicationConfirmation({
         email: String(email),
@@ -69,6 +78,7 @@ export async function POST(request: Request) {
         position: position ? String(position) : undefined,
       }),
       sendApplicationNotification({
+        to: adminEmails,
         firstName: String(firstName),
         lastName: String(lastName),
         email: String(email),

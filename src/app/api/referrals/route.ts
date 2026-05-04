@@ -33,6 +33,15 @@ export async function POST(request: Request) {
       },
     });
 
+    const { docs: adminUsers } = await payload.find({
+      collection: "users",
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      where: { role: { equals: "administrator" } } as any,
+      limit: 100,
+      depth: 0,
+    });
+    const adminEmails = adminUsers.map((u) => (u as { email: string }).email).filter(Boolean);
+
     await Promise.all([
       sendReferralConfirmation({
         referrerEmail: referrerEmail ? String(referrerEmail) : undefined,
@@ -44,6 +53,7 @@ export async function POST(request: Request) {
         notes: notes ? String(notes) : undefined,
       }),
       sendReferralNotification({
+        to: adminEmails,
         referrerName: String(referrerName),
         referrerPhone: String(referrerPhone),
         referrerEmail: referrerEmail ? String(referrerEmail) : undefined,

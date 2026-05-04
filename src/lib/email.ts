@@ -3,13 +3,6 @@ import { Resend } from "resend";
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const FROM = "Algonquin Nurses <noreply@algonquinnurses.com>";
-const STAFF_EMAILS = [
-  "romeo@wyzdigital.com",
-  "dsmith@wyzdigital.com",
-  "rpeters@algonquinnurses.com",
-  "rbilzing@algonquinnurses.com",
-  "cmansfield@algonquinnurses.com",
-];
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.algonquinnurses.com";
 const LOGO_URL = `${SITE_URL}/images/algonquin-logo-top-300.png`;
 const YEAR = new Date().getFullYear();
@@ -259,6 +252,7 @@ export function sendApplicationConfirmation(data: {
 }
 
 export function sendContactNotification(data: {
+  to: string[];
   firstName: string;
   lastName: string;
   email: string;
@@ -266,10 +260,10 @@ export function sendContactNotification(data: {
   service?: string;
   message: string;
 }) {
-  if (!process.env.RESEND_API_KEY) return Promise.resolve();
+  if (!process.env.RESEND_API_KEY || data.to.length === 0) return Promise.resolve();
   return resend.emails.send({
     from: FROM,
-    to: STAFF_EMAILS,
+    to: data.to,
     subject: "Contact Form",
     html: buildEmailHtml({
       subject: "Contact Form",
@@ -287,6 +281,7 @@ export function sendContactNotification(data: {
 }
 
 export function sendReferralNotification(data: {
+  to: string[];
   referrerName: string;
   referrerPhone: string;
   referrerEmail?: string;
@@ -295,10 +290,10 @@ export function sendReferralNotification(data: {
   service?: string;
   notes?: string;
 }) {
-  if (!process.env.RESEND_API_KEY) return Promise.resolve();
+  if (!process.env.RESEND_API_KEY || data.to.length === 0) return Promise.resolve();
   return resend.emails.send({
     from: FROM,
-    to: STAFF_EMAILS,
+    to: data.to,
     subject: "Referral Form",
     html: buildEmailHtml({
       subject: "Referral Form",
@@ -318,13 +313,14 @@ export function sendReferralNotification(data: {
 }
 
 export function sendApplicationNotification(data: {
+  to: string[];
   firstName: string;
   lastName: string;
   email: string;
   phone: string;
   position?: string;
 }) {
-  if (!process.env.RESEND_API_KEY) return Promise.resolve();
+  if (!process.env.RESEND_API_KEY || data.to.length === 0) return Promise.resolve();
   const POSITION_LABELS: Record<string, string> = {
     cna: "Certified Nursing Assistant (CNA)",
     hha: "Home Health Aide (HHA)",
@@ -334,7 +330,7 @@ export function sendApplicationNotification(data: {
   };
   return resend.emails.send({
     from: FROM,
-    to: STAFF_EMAILS,
+    to: data.to,
     subject: "Career Form",
     html: buildEmailHtml({
       subject: "Career Form",
