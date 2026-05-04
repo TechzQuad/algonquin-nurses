@@ -146,6 +146,10 @@ export interface UserAuthOperations {
 export interface User {
   id: number;
   name?: string | null;
+  /**
+   * Administrator: full control over all content and users. Editor: manage all content. Author: publish own posts and upload media. Contributor: draft own posts (cannot publish). Subscriber: profile only.
+   */
+  role: 'administrator' | 'editor' | 'author' | 'contributor' | 'subscriber';
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -617,6 +621,7 @@ export interface PayloadMigration {
  */
 export interface UsersSelect<T extends boolean = true> {
   name?: T;
+  role?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
