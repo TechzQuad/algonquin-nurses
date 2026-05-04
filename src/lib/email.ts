@@ -317,6 +317,39 @@ export function sendReferralNotification(data: {
   }).catch((err) => console.error("Staff referral notification failed:", err));
 }
 
+export function sendApplicationNotification(data: {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  position?: string;
+}) {
+  if (!process.env.RESEND_API_KEY) return Promise.resolve();
+  const POSITION_LABELS: Record<string, string> = {
+    cna: "Certified Nursing Assistant (CNA)",
+    hha: "Home Health Aide (HHA)",
+    rn: "Registered Nurse (RN)",
+    lpn: "Licensed Practical Nurse (LPN)",
+    other: "Other",
+  };
+  return resend.emails.send({
+    from: FROM,
+    to: STAFF_EMAILS,
+    subject: "Career Form",
+    html: buildEmailHtml({
+      subject: "Career Form",
+      greeting: "New Job Application Submission",
+      intro: "A candidate submitted a job application through the website.",
+      tableRows: [
+        row("Name", `${data.firstName} ${data.lastName}`),
+        row("Email", data.email),
+        row("Phone", data.phone),
+        ...(data.position ? [row("Position", POSITION_LABELS[data.position] ?? data.position)] : []),
+      ].join(""),
+    }),
+  }).catch((err) => console.error("Staff application notification failed:", err));
+}
+
 export function sendChatLeadConfirmation(data: {
   email: string;
   name: string;
