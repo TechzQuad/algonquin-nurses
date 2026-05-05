@@ -1,8 +1,16 @@
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST ?? "smtp.hostinger.com",
+  port: Number(process.env.SMTP_PORT ?? 465),
+  secure: true, // port 465 = SSL
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+});
 
-const FROM      = process.env.RESEND_FROM_EMAIL ?? "Algonquin Nurses <onboarding@resend.dev>";
+const FROM = `Algonquin Nurses <${process.env.SMTP_USER ?? "mail@algonquinnursesstl.online"}>`;
 const SITE_URL  = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.algonquinnurses.com";
 const LOGO_URL  = "https://www.algonquinnurses.com/images/algonquin-logo-top-300.png";
 const ADMIN_URL = `${SITE_URL}/admin`;
@@ -316,31 +324,38 @@ export async function sendEmail(opts: {
   ctaLabel?: string;
   ctaHref?: string;
 }) {
-  if (!process.env.RESEND_API_KEY) return;
-  const { error } = await resend.emails.send({
-    from: FROM,
-    to: [opts.to],
-    subject: opts.subject,
-    html: buildConfirmationHtml(opts),
-  });
-  if (error) console.error("[resend] confirmation error:", error);
+  if (!process.env.SMTP_USER || !process.env.SMTP_PASS) return;
+  try {
+    await transporter.sendMail({
+      from: FROM,
+      to: opts.to,
+      subject: opts.subject,
+      html: buildConfirmationHtml(opts),
+    });
+    console.log("[smtp] confirmation sent to:", opts.to);
+  } catch (err) {
+    console.error("[smtp] confirmation error:", err);
+  }
 }
 
 // ─── Shared sender for notifications ─────────────────────────────────────────
 
 async function sendNotification(to: string[], subject: string, formType: string, fieldsHtml: string) {
-  if (!process.env.RESEND_API_KEY || to.length === 0) {
-    console.log(`[resend] skipping ${formType} notification — no API key or no recipients`);
+  if (!process.env.SMTP_USER || !process.env.SMTP_PASS || to.length === 0) {
+    console.log(`[smtp] skipping ${formType} notification — no credentials or no recipients`);
     return;
   }
-  const { data, error } = await resend.emails.send({
-    from: FROM,
-    to,
-    subject,
-    html: buildNotificationHtml(formType, fieldsHtml),
-  });
-  if (error) console.error(`[resend] ${formType} notification error:`, error);
-  else console.log(`[resend] ${formType} notification sent, id:`, data?.id);
+  try {
+    await transporter.sendMail({
+      from: FROM,
+      to: to.join(", "),
+      subject,
+      html: buildNotificationHtml(formType, fieldsHtml),
+    });
+    console.log(`[smtp] ${formType} notification sent to:`, to);
+  } catch (err) {
+    console.error(`[smtp] ${formType} notification error:`, err);
+  }
 }
 
 // ─── Confirmation emails (to submitter) ───────────────────────────────────────
