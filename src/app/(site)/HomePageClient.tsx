@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useRef, useState } from "react";
 import {
   Heart,
@@ -101,8 +101,6 @@ export function HomePageClient({
   const [isPlaying, setIsPlaying] = useState(true);
   const [isMuted, setIsMuted] = useState(true);
   const [volume, setVolume] = useState(0.7);
-  const [showControls, setShowControls] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
 
   function togglePlay() {
     const v = videoRef.current;
@@ -219,95 +217,44 @@ export function HomePageClient({
               transition={{ duration: 0.5 }}
               className="relative"
             >
-              <div
-                className="relative rounded-2xl overflow-hidden shadow-2xl group cursor-pointer"
-                onMouseEnter={() => { setIsHovered(true); setShowControls(true); }}
-                onMouseLeave={() => { setIsHovered(false); setShowControls(false); }}
-                onClick={togglePlay}
-              >
-                {/* Glow ring on hover */}
-                <motion.div
-                  animate={{ opacity: isHovered ? 1 : 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="absolute -inset-[3px] rounded-2xl bg-gradient-to-br from-primary via-accent to-primary/40 z-0 blur-sm"
+              <div className="relative rounded-2xl overflow-hidden shadow-2xl">
+                <video
+                  ref={videoRef}
+                  src="/videos/testimonial.mp4"
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  className="w-full h-auto object-cover"
                 />
+                <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent pointer-events-none" />
 
-                <div className="relative z-10 rounded-2xl overflow-hidden">
-                  <video
-                    ref={videoRef}
-                    src="/videos/testimonial.mp4"
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    className="w-full h-auto object-cover"
-                    style={{ filter: isHovered ? "brightness(0.85)" : "brightness(1)", transition: "filter 0.3s" }}
+                {/* Controls bar */}
+                <div className="absolute bottom-0 left-0 right-0 px-4 py-3 flex items-center gap-3 bg-gradient-to-t from-black/50 to-transparent">
+                  <button
+                    onClick={togglePlay}
+                    className="text-white hover:text-accent transition-colors flex-shrink-0"
+                    aria-label={isPlaying ? "Pause" : "Play"}
+                  >
+                    {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
+                  </button>
+                  <button
+                    onClick={toggleMute}
+                    className="text-white hover:text-accent transition-colors flex-shrink-0"
+                    aria-label={isMuted ? "Unmute" : "Mute"}
+                  >
+                    {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+                  </button>
+                  <input
+                    type="range"
+                    min={0}
+                    max={1}
+                    step={0.05}
+                    value={isMuted ? 0 : volume}
+                    onChange={handleVolume}
+                    className="flex-1 h-1 accent-accent cursor-pointer"
+                    aria-label="Volume"
                   />
-
-                  {/* Gradient overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
-
-                  {/* Play/Pause overlay icon */}
-                  <AnimatePresence>
-                    {!isPlaying && (
-                      <motion.div
-                        key="play-icon"
-                        initial={{ opacity: 0, scale: 0.7 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.7 }}
-                        className="absolute inset-0 flex items-center justify-center pointer-events-none"
-                      >
-                        <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/40">
-                          <Play className="w-8 h-8 text-white ml-1" />
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-
-                  {/* Controls bar */}
-                  <AnimatePresence>
-                    {showControls && (
-                      <motion.div
-                        key="controls"
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 10 }}
-                        transition={{ duration: 0.2 }}
-                        className="absolute bottom-0 left-0 right-0 px-4 py-3 flex items-center gap-3 bg-gradient-to-t from-black/60 to-transparent"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        {/* Play/Pause button */}
-                        <button
-                          onClick={togglePlay}
-                          className="text-white hover:text-accent transition-colors flex-shrink-0"
-                          aria-label={isPlaying ? "Pause" : "Play"}
-                        >
-                          {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
-                        </button>
-
-                        {/* Mute toggle */}
-                        <button
-                          onClick={toggleMute}
-                          className="text-white hover:text-accent transition-colors flex-shrink-0"
-                          aria-label={isMuted ? "Unmute" : "Mute"}
-                        >
-                          {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
-                        </button>
-
-                        {/* Volume slider */}
-                        <input
-                          type="range"
-                          min={0}
-                          max={1}
-                          step={0.05}
-                          value={isMuted ? 0 : volume}
-                          onChange={handleVolume}
-                          className="flex-1 h-1 accent-accent cursor-pointer"
-                          aria-label="Volume"
-                        />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
                 </div>
               </div>
               {/* Floating badge */}
