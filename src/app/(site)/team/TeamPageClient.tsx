@@ -38,7 +38,7 @@ export function TeamPageClient() {
         description="Our dedicated team of healthcare professionals is committed to providing the highest quality care in your home."
         imageSrc="/images/about.png"
         imageAlt="Algonquin Nurses team"
-        imagePosition="center top"
+        imagePosition="center 30%"
         compact
         showCTA={false}
       />
