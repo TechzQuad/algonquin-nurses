@@ -27,10 +27,10 @@ export function Footer() {
           {/* Company info */}
           <div className="lg:col-span-1">
             <Image
-              src="/images/algonquin-logo-bottom3.png"
+              src="/images/footer-logo.png"
               alt="Algonquin Nurses Home Health"
-              width={200}
-              height={55}
+              width={300}
+              height={160}
               className="h-12 w-auto mb-5 brightness-110"
             />
             <p className="text-white/80 text-sm leading-relaxed mb-6">

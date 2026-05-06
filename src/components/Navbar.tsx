@@ -77,10 +77,10 @@ export function Navbar() {
             {/* Logo */}
             <Link href="/" className="flex-shrink-0">
               <Image
-                src="/images/algonquin-logo-top-300.png"
+                src="/images/ofl.png"
                 alt="Algonquin Nurses Home Health"
-                width={220}
-                height={60}
+                width={300}
+                height={160}
                 className="h-12 lg:h-14 w-auto"
                 priority
               />
