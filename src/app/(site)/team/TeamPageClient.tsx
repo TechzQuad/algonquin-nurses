@@ -50,7 +50,8 @@ export function TeamPageClient() {
             title="Our Founders"
             description="A family legacy of compassionate care spanning over three decades."
           />
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-4xl mx-auto space-y-6">
+            {/* Founder */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -80,6 +81,50 @@ export function TeamPageClient() {
                 </div>
               </div>
             </motion.div>
+
+            {/* Staff members */}
+            {[
+              {
+                name: "Renee Peters",
+                role: "Director of Pvt. Duty – Mo Health Net Div.",
+                image: "/images/Renee-Peters.jpeg",
+              },
+              {
+                name: "Cara Drollinger",
+                role: "Office Manager / Marketer – House Springs Office",
+                image: "/images/Cara-Drollinger.jpeg",
+              },
+              {
+                name: "Rhonda Blizing",
+                role: "Branch Manager",
+                image: "/images/Rhonda-Blizing.jpeg",
+              },
+            ].map((person, index) => (
+              <motion.div
+                key={person.name}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="bg-surface rounded-2xl overflow-hidden border border-neutral-100"
+              >
+                <div className="grid grid-cols-1 md:grid-cols-2">
+                  <div className="relative h-64 md:h-auto">
+                    <Image
+                      src={person.image}
+                      alt={person.name}
+                      fill
+                      className="object-cover object-top"
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                    />
+                  </div>
+                  <div className="p-8 lg:p-10 flex flex-col justify-center">
+                    <h4 className="text-xl font-bold text-neutral-900 mb-1">{person.name}</h4>
+                    <p className="text-sm text-primary font-medium">{person.role}</p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
