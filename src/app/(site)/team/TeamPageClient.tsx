@@ -36,7 +36,7 @@ export function TeamPageClient() {
         subtitle="Our People"
         title="Meet the Team Behind Your Care"
         description="Our dedicated team of healthcare professionals is committed to providing the highest quality care in your home."
-        imageSrc="/images/about.png"
+        imageSrc="/images/ah.jpg"
         imageAlt="Algonquin Nurses team"
         imagePosition="center 30%"
         compact
