@@ -99,8 +99,17 @@ export function FeedbackPageClient({ testimonials = [] }: { testimonials?: Testi
               <p className="text-neutral-600 leading-relaxed mb-3">
                 At Algonquin Nurses, we believe the best measure of our work is the peace of mind we bring to families across St. Louis — one home, one person at a time.
               </p>
+              <p className="text-neutral-600 leading-relaxed mb-3">
+                Every caregiver we send into a home carries with them decades of experience, rigorous training, and — most importantly — a genuine commitment to treating your loved one with the dignity and respect they deserve.
+              </p>
+              <p className="text-neutral-600 leading-relaxed mb-3">
+                Whether it's a few hours of companionship or around-the-clock skilled nursing, our clients consistently tell us the same thing: they finally feel at ease knowing someone truly cares.
+              </p>
+              <p className="text-neutral-600 leading-relaxed mb-3">
+                That trust is not taken lightly. It drives everything we do — from how we screen our staff to how we follow up with families long after care begins.
+              </p>
               <p className="text-neutral-600 leading-relaxed">
-                Watched their story? We'd love to hear yours — scroll down and leave your feedback. It takes less than two minutes.
+                Watched their story? We'd love to hear yours — scroll down and leave your feedback. It takes less than two minutes and means everything to our team.
               </p>
             </motion.div>
 
