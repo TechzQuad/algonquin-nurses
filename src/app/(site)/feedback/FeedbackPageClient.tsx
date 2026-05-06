@@ -81,7 +81,7 @@ export function FeedbackPageClient({ testimonials = [] }: { testimonials?: Testi
       {/* Video section */}
       <section className="py-12 lg:py-16 bg-surface">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-stretch">
             {/* Copy */}
             <motion.div
               initial={{ opacity: 0, x: -30 }}
@@ -119,8 +119,9 @@ export function FeedbackPageClient({ testimonials = [] }: { testimonials?: Testi
                 muted
                 loop
                 playsInline
-                className="w-full h-auto object-cover"
+                className="w-full h-full object-cover absolute inset-0"
               />
+              <div className="w-full h-full" />
               <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent pointer-events-none" />
 
               {/* Controls bar */}
