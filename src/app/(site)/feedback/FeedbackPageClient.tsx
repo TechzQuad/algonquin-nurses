@@ -79,9 +79,9 @@ export function FeedbackPageClient({ testimonials = [] }: { testimonials?: Testi
       />
 
       {/* Video section */}
-      <section className="py-20 lg:py-28 bg-surface">
+      <section className="py-12 lg:py-16 bg-surface">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             {/* Copy */}
             <motion.div
               initial={{ opacity: 0, x: -30 }}
@@ -89,18 +89,18 @@ export function FeedbackPageClient({ testimonials = [] }: { testimonials?: Testi
               viewport={{ once: true }}
               transition={{ duration: 0.5 }}
             >
-              <p className="text-sm font-semibold text-primary uppercase tracking-widest mb-3">Real Stories. Real Families.</p>
-              <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 mb-5 leading-tight">
-                Hear It Straight From the<br className="hidden lg:block" /> People We Serve
+              <p className="text-sm font-semibold text-primary uppercase tracking-widest mb-2">Real Stories. Real Families.</p>
+              <h2 className="text-2xl lg:text-3xl font-bold text-neutral-900 mb-4 leading-tight">
+                Hear It Straight From the People We Serve
               </h2>
-              <p className="text-neutral-600 leading-relaxed mb-5">
+              <p className="text-neutral-600 leading-relaxed mb-3">
                 Behind every review is a family who trusted us with someone they love. These aren't just words — they're real moments shared by real clients who've experienced our care firsthand.
               </p>
-              <p className="text-neutral-600 leading-relaxed mb-5">
-                At Algonquin Nurses, we believe the best measure of our work is the peace of mind we bring to families across the St. Louis metro area — one home, one person at a time.
+              <p className="text-neutral-600 leading-relaxed mb-3">
+                At Algonquin Nurses, we believe the best measure of our work is the peace of mind we bring to families across St. Louis — one home, one person at a time.
               </p>
               <p className="text-neutral-600 leading-relaxed">
-                Watched their story? We'd love to hear yours. Scroll down and leave us your feedback — it takes less than two minutes and means the world to our team.
+                Watched their story? We'd love to hear yours — scroll down and leave your feedback. It takes less than two minutes.
               </p>
             </motion.div>
 
