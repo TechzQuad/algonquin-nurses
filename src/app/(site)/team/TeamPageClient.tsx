@@ -12,11 +12,6 @@ const leadership = [
     role: "Co-Owner",
     desc: "Steve co-founded Algonquin Nurses and has been instrumental in growing the company's operations across the St. Louis metro area since 1987.",
   },
-  {
-    name: "Mark Tamboli",
-    role: "Co-Owner",
-    desc: "Mark joined in 1990 to establish the Medicaid and Private Duty Division, expanding the company's reach to serve more families in need.",
-  },
 ];
 
 const departments = [
@@ -66,8 +61,8 @@ export function TeamPageClient() {
               <div className="grid grid-cols-1 md:grid-cols-2">
                 <div className="relative h-72 md:h-auto">
                   <Image
-                    src="/images/steve-mark.jpg"
-                    alt="Steve and Mark Tamboli"
+                    src="/images/founder.jpeg"
+                    alt="Steve Tamboli"
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, 50vw"
