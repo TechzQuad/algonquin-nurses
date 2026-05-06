@@ -84,8 +84,8 @@ export function AboutPageClient() {
               className="relative w-full aspect-[4/5] rounded-3xl overflow-hidden shadow-xl order-last lg:order-first"
             >
               <Image
-                src="/images/founder.jpeg"
-                alt="Steve Tamboli, founder of Algonquin Nurses Home Health Care"
+                src="/images/serv.png"
+                alt="Algonquin Nurses Home Health Care services"
                 fill
                 className="object-cover object-center"
                 sizes="(max-width: 1024px) 100vw, 50vw"
