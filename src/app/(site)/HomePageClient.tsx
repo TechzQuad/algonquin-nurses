@@ -252,7 +252,7 @@ export function HomePageClient({
                     step={0.05}
                     value={isMuted ? 0 : volume}
                     onChange={handleVolume}
-                    className="flex-1 h-1 accent-accent cursor-pointer"
+                    className="w-16 h-1 accent-accent cursor-pointer"
                     aria-label="Volume"
                   />
                 </div>
