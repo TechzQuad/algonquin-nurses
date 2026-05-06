@@ -217,7 +217,7 @@ export function HomePageClient({
               transition={{ duration: 0.5 }}
               className="relative"
             >
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl">
+              <div className="relative rounded-2xl overflow-hidden shadow-2xl group">
                 <video
                   ref={videoRef}
                   src="/videos/testimonial.mp4"
@@ -230,7 +230,7 @@ export function HomePageClient({
                 <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent pointer-events-none" />
 
                 {/* Controls bar */}
-                <div className="absolute bottom-0 left-0 right-0 px-4 py-3 flex items-center gap-3 bg-gradient-to-t from-black/50 to-transparent">
+                <div className="absolute bottom-0 left-0 right-0 px-4 py-3 flex items-center gap-3 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <button
                     onClick={togglePlay}
                     className="text-white hover:text-accent transition-colors flex-shrink-0"
