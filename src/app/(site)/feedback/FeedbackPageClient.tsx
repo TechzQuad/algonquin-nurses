@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { motion } from "framer-motion";
-import { Send, Star } from "lucide-react";
+import { Send, Star, Play, Pause, Volume2, VolumeX } from "lucide-react";
 import { Hero } from "@/components/Hero";
 import { SectionHeading } from "@/components/SectionHeading";
 import { Testimonials, type TestimonialItem } from "@/components/Testimonials";
@@ -13,6 +13,34 @@ export function FeedbackPageClient({ testimonials = [] }: { testimonials?: Testi
   const [rating, setRating] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [isMuted, setIsMuted] = useState(true);
+  const [volume, setVolume] = useState(0.7);
+
+  function togglePlay() {
+    const v = videoRef.current;
+    if (!v) return;
+    if (v.paused) { v.play(); setIsPlaying(true); }
+    else { v.pause(); setIsPlaying(false); }
+  }
+
+  function toggleMute() {
+    const v = videoRef.current;
+    if (!v) return;
+    v.muted = !v.muted;
+    setIsMuted(v.muted);
+    if (!v.muted) v.volume = volume;
+  }
+
+  function handleVolume(e: React.ChangeEvent<HTMLInputElement>) {
+    const v = videoRef.current;
+    const val = parseFloat(e.target.value);
+    setVolume(val);
+    if (v) { v.volume = val; v.muted = val === 0; }
+    setIsMuted(val === 0);
+  }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -49,6 +77,75 @@ export function FeedbackPageClient({ testimonials = [] }: { testimonials?: Testi
         compact
         showCTA={false}
       />
+
+      {/* Video section */}
+      <section className="py-20 lg:py-28 bg-surface">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+            {/* Copy */}
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+            >
+              <p className="text-sm font-semibold text-primary uppercase tracking-widest mb-3">Real Stories. Real Families.</p>
+              <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 mb-5 leading-tight">
+                Hear It Straight From the<br className="hidden lg:block" /> People We Serve
+              </h2>
+              <p className="text-neutral-600 leading-relaxed mb-5">
+                Behind every review is a family who trusted us with someone they love. These aren't just words — they're real moments shared by real clients who've experienced our care firsthand.
+              </p>
+              <p className="text-neutral-600 leading-relaxed mb-5">
+                At Algonquin Nurses, we believe the best measure of our work is the peace of mind we bring to families across the St. Louis metro area — one home, one person at a time.
+              </p>
+              <p className="text-neutral-600 leading-relaxed">
+                Watched their story? We'd love to hear yours. Scroll down and leave us your feedback — it takes less than two minutes and means the world to our team.
+              </p>
+            </motion.div>
+
+            {/* Video */}
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="relative rounded-2xl overflow-hidden shadow-2xl group"
+            >
+              <video
+                ref={videoRef}
+                src="/videos/testimonial.mp4"
+                autoPlay
+                muted
+                loop
+                playsInline
+                className="w-full h-auto object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent pointer-events-none" />
+
+              {/* Controls bar */}
+              <div className="absolute bottom-0 left-0 right-0 px-4 py-3 flex items-center gap-3 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <button onClick={togglePlay} className="text-white hover:text-accent transition-colors flex-shrink-0" aria-label={isPlaying ? "Pause" : "Play"}>
+                  {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
+                </button>
+                <button onClick={toggleMute} className="text-white hover:text-accent transition-colors flex-shrink-0" aria-label={isMuted ? "Unmute" : "Mute"}>
+                  {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+                </button>
+                <input
+                  type="range"
+                  min={0}
+                  max={1}
+                  step={0.05}
+                  value={isMuted ? 0 : volume}
+                  onChange={handleVolume}
+                  className="w-16 h-1 accent-accent cursor-pointer"
+                  aria-label="Volume"
+                />
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
 
       {/* Existing testimonials */}
       <section className="py-20 lg:py-28 bg-white">
