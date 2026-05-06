@@ -185,11 +185,12 @@ export function HomePageClient({
               className="relative"
             >
               <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-                <Image
-                  src="/images/serv.png"
-                  alt="Customized care for every life stage"
-                  width={600}
-                  height={500}
+                <video
+                  src="/videos/testimonial.mp4"
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
                   className="w-full h-auto object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent" />
