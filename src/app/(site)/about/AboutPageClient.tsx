@@ -84,7 +84,7 @@ export function AboutPageClient() {
               className="relative w-full aspect-[4/5] rounded-3xl overflow-hidden shadow-xl order-last lg:order-first"
             >
               <Image
-                src="/images/serv.png"
+                src="/images/fn.png"
                 alt="Algonquin Nurses Home Health Care services"
                 fill
                 className="object-cover object-center"
