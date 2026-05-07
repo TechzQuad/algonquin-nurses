@@ -9,8 +9,8 @@ import { CTASection } from "@/components/CTASection";
 const leadership = [
   {
     name: "Steve Tamboli",
-    role: "Co-Owner",
-    desc: "Steve co-founded Algonquin Nurses and has been instrumental in growing the company's operations across the St. Louis metro area since 1987.",
+    role: "Owner",
+    desc: "Steve founded Algonquin Nurses and has been instrumental in growing the company's operations across the St. Louis metro area since 1987.",
   },
 ];
 
@@ -61,12 +61,12 @@ export function TeamPageClient() {
               className="bg-surface rounded-2xl overflow-hidden border border-neutral-100"
             >
               <div className="grid grid-cols-1 md:grid-cols-2">
-                <div className="relative h-72 md:h-auto">
+                <div className="relative h-[420px] md:h-auto">
                   <Image
                     src="/images/founder.jpeg"
                     alt="Steve Tamboli"
                     fill
-                    className="object-cover"
+                    className="object-cover object-top"
                     sizes="(max-width: 768px) 100vw, 50vw"
                   />
                 </div>
@@ -88,12 +88,12 @@ export function TeamPageClient() {
               {[
                 {
                   name: "Renee Peters",
-                  role: "Director of Pvt. Duty – Mo Health Net Div.",
+                  role: "Director of Private Duty - Missouri Health Network Division",
                   image: "/images/Renee-Peters.jpeg",
                 },
                 {
                   name: "Cara Drollinger",
-                  role: "Office Manager / Marketer – House Springs Office",
+                  role: "Marketing Manager, Office Manager - House Springs",
                   image: "/images/Cara-Drollinger.jpeg",
                 },
                 {
