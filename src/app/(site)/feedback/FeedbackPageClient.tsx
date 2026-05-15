@@ -212,6 +212,19 @@ export function FeedbackPageClient({ testimonials = [] }: { testimonials?: Testi
                 </div>
               </div>
 
+              <div>
+                <label htmlFor="fbEmail" className="block text-sm font-medium text-neutral-700 mb-1.5">
+                  Email Address <span className="text-neutral-400 font-normal">(optional — for a confirmation copy)</span>
+                </label>
+                <input
+                  type="email"
+                  id="fbEmail"
+                  name="email"
+                  className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                  placeholder="you@example.com"
+                />
+              </div>
+
               {/* Star rating */}
               <div>
                 <label className="block text-sm font-medium text-neutral-700 mb-2">Rating</label>

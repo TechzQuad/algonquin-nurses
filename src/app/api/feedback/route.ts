@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getPayloadClient } from "@/lib/payload";
 import { verifyRecaptcha } from "@/lib/recaptcha";
+import { sendFeedbackConfirmation, sendFeedbackNotification } from "@/lib/email";
 
 export const runtime = "nodejs";
 
@@ -10,7 +11,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const { name, relationship, rating, message, recaptchaToken } = body as Record<string, unknown>;
+  const { name, email, relationship, rating, message, recaptchaToken } = body as Record<string, unknown>;
 
   const isHuman = await verifyRecaptcha(String(recaptchaToken ?? ""), "feedback");
   if (!isHuman) {
@@ -38,6 +39,33 @@ export async function POST(request: Request) {
         message: String(message),
       },
     });
+
+    const { docs: adminUsers } = await payload.find({
+      collection: "users",
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      where: { role: { equals: "administrator" } } as any,
+      limit: 100,
+      depth: 0,
+      overrideAccess: true,
+    });
+    const adminEmails = adminUsers.map((u) => (u as { email: string }).email).filter(Boolean);
+
+    const emailStr = email ? String(email) : undefined;
+    const nameStr  = name  ? String(name)  : undefined;
+
+    await Promise.allSettled([
+      sendFeedbackNotification({
+        to:           adminEmails,
+        name:         nameStr,
+        relationship: relationship ? String(relationship) : undefined,
+        rating:       safeRating,
+        message:      String(message),
+      }),
+      emailStr
+        ? sendFeedbackConfirmation({ email: emailStr, name: nameStr })
+        : Promise.resolve(),
+    ]);
+
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error("feedback submission failed", err);
