@@ -6,6 +6,7 @@ import { Heart, Clock, MapPin, Shield, Users, Award, Send, Briefcase, Upload, Fi
 import { Hero } from "@/components/Hero";
 import { SectionHeading } from "@/components/SectionHeading";
 import { CTASection } from "@/components/CTASection";
+import { getRecaptchaToken } from "@/hooks/useRecaptcha";
 
 const benefits = [
   { icon: Clock, title: "Flexible Scheduling", desc: "Work hours that fit your lifestyle, including part-time and full-time options." },
@@ -61,6 +62,8 @@ export function CareersPageClient() {
     setError(null);
     const formData = new FormData(e.currentTarget);
     try {
+      const recaptchaToken = await getRecaptchaToken("apply");
+      formData.append("recaptchaToken", recaptchaToken);
       const res = await fetch("/api/applications", {
         method: "POST",
         body: formData,

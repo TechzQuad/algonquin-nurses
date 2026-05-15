@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { X, Send } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { getRecaptchaToken } from "@/hooks/useRecaptcha";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -303,6 +304,7 @@ export function ChatWidget() {
       setSaving(true);
 
       try {
+        const recaptchaToken = await getRecaptchaToken("chat_lead").catch(() => "");
         await fetch("/api/chat-leads", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -311,6 +313,7 @@ export function ChatWidget() {
             email: updatedLead.email,
             phone: updatedLead.phone,
             service: selectedService ?? undefined,
+            recaptchaToken,
           }),
         });
       } catch {
@@ -365,6 +368,7 @@ export function ChatWidget() {
       setContactForm(updated);
       setSaving(true);
       try {
+        const recaptchaToken = await getRecaptchaToken("contact").catch(() => "");
         await fetch("/api/contact", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -375,6 +379,7 @@ export function ChatWidget() {
             phone: updated.phone,
             service: updated.service || undefined,
             message: updated.message,
+            recaptchaToken,
           }),
         });
       } catch {

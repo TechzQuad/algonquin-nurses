@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getPayloadClient } from "@/lib/payload";
+import { verifyRecaptcha } from "@/lib/recaptcha";
 
 export const runtime = "nodejs";
 
@@ -9,7 +10,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const { name, relationship, rating, message } = body as Record<string, unknown>;
+  const { name, relationship, rating, message, recaptchaToken } = body as Record<string, unknown>;
+
+  const isHuman = await verifyRecaptcha(String(recaptchaToken ?? ""), "feedback");
+  if (!isHuman) {
+    return NextResponse.json({ error: "reCAPTCHA verification failed. Please try again." }, { status: 400 });
+  }
 
   if (!message) {
     return NextResponse.json({ error: "Message is required" }, { status: 400 });

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getPayloadClient } from "@/lib/payload";
 import { sendReferralConfirmation, sendReferralNotification } from "@/lib/email";
+import { verifyRecaptcha } from "@/lib/recaptcha";
 
 export const runtime = "nodejs";
 
@@ -10,8 +11,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const { referrerName, referrerPhone, referrerEmail, clientName, clientPhone, service, notes } =
+  const { referrerName, referrerPhone, referrerEmail, clientName, clientPhone, service, notes, recaptchaToken } =
     body as Record<string, unknown>;
+
+  const isHuman = await verifyRecaptcha(String(recaptchaToken ?? ""), "referral");
+  if (!isHuman) {
+    return NextResponse.json({ error: "reCAPTCHA verification failed. Please try again." }, { status: 400 });
+  }
 
   if (!referrerName || !referrerPhone || !clientName) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });

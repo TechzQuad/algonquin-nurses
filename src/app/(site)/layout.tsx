@@ -61,6 +61,11 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} h-full`}>
       <head>
         <SchemaMarkup />
+        {/* reCAPTCHA v3 Enterprise — loaded globally so all forms share one script */}
+        <script
+          src={`https://www.google.com/recaptcha/enterprise.js?render=${process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}`}
+          async
+        />
       </head>
       <body className="min-h-full flex flex-col font-[var(--font-inter)] antialiased">
         <Navbar />

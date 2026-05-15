@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getPayloadClient } from "@/lib/payload";
 import { sendApplicationConfirmation, sendApplicationNotification } from "@/lib/email";
+import { verifyRecaptcha } from "@/lib/recaptcha";
 
 export const runtime = "nodejs";
 
@@ -10,6 +11,12 @@ export async function POST(request: Request) {
     formData = await request.formData();
   } catch {
     return NextResponse.json({ error: "Invalid form data" }, { status: 400 });
+  }
+
+  const recaptchaToken = formData.get("recaptchaToken");
+  const isHuman = await verifyRecaptcha(String(recaptchaToken ?? ""), "apply");
+  if (!isHuman) {
+    return NextResponse.json({ error: "reCAPTCHA verification failed. Please try again." }, { status: 400 });
   }
 
   const firstName = formData.get("firstName");

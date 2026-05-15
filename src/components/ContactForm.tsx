@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Send } from "lucide-react";
+import { getRecaptchaToken } from "@/hooks/useRecaptcha";
 
 export function ContactForm() {
   const [submitted, setSubmitted] = useState(false);
@@ -17,10 +18,11 @@ export function ContactForm() {
     const payload = Object.fromEntries(formData.entries());
 
     try {
+      const recaptchaToken = await getRecaptchaToken("contact");
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ ...payload, recaptchaToken }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));

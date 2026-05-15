@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getPayloadClient } from "@/lib/payload";
 import { sendChatLeadConfirmation } from "@/lib/email";
+import { verifyRecaptcha } from "@/lib/recaptcha";
 
 export const runtime = "nodejs";
 
@@ -10,7 +11,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const { name, email, phone, service } = body as Record<string, unknown>;
+  const { name, email, phone, service, recaptchaToken } = body as Record<string, unknown>;
+
+  const isHuman = await verifyRecaptcha(String(recaptchaToken ?? ""), "chat_lead");
+  if (!isHuman) {
+    return NextResponse.json({ error: "reCAPTCHA verification failed." }, { status: 400 });
+  }
 
   if (!name || !email || !phone) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });

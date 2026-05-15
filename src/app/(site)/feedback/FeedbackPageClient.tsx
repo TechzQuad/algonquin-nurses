@@ -7,6 +7,7 @@ import { Hero } from "@/components/Hero";
 import { SectionHeading } from "@/components/SectionHeading";
 import { Testimonials, type TestimonialItem } from "@/components/Testimonials";
 import { CTASection } from "@/components/CTASection";
+import { getRecaptchaToken } from "@/hooks/useRecaptcha";
 
 export function FeedbackPageClient({ testimonials = [] }: { testimonials?: TestimonialItem[] }) {
   const [submitted, setSubmitted] = useState(false);
@@ -49,10 +50,11 @@ export function FeedbackPageClient({ testimonials = [] }: { testimonials?: Testi
     const formData = new FormData(e.currentTarget);
     const payload = { ...Object.fromEntries(formData.entries()), rating };
     try {
+      const recaptchaToken = await getRecaptchaToken("feedback");
       const res = await fetch("/api/feedback", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ ...payload, recaptchaToken }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));

@@ -6,6 +6,7 @@ import { Send, Users, Heart, CheckCircle2 } from "lucide-react";
 import { Hero } from "@/components/Hero";
 import { SectionHeading } from "@/components/SectionHeading";
 import { CTASection } from "@/components/CTASection";
+import { getRecaptchaToken } from "@/hooks/useRecaptcha";
 
 export function ClientReferralPageClient() {
   const [submitted, setSubmitted] = useState(false);
@@ -19,10 +20,11 @@ export function ClientReferralPageClient() {
     const formData = new FormData(e.currentTarget);
     const payload = Object.fromEntries(formData.entries());
     try {
+      const recaptchaToken = await getRecaptchaToken("referral");
       const res = await fetch("/api/referrals", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ ...payload, recaptchaToken }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
