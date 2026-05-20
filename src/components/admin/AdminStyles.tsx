@@ -257,24 +257,36 @@ export function AdminStyles() {
   background: rgba(255,255,255,0.25) !important;
   border-color: rgba(255,255,255,0.55) !important;
 }
-/* Popup / dropdown menu panel that opens (render in light bg for readability) */
+/* Popup / dropdown menu panel that opens (light bg, dark text for readability) */
 .popup__content,
-.popup-button-list {
+.popup-button-list,
+.step-nav__popup,
+.step-nav__popup .popup__content {
   background: #ffffff !important;
   border: 1px solid #e5e7eb !important;
   border-radius: 8px !important;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.15) !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18) !important;
+}
+/* Force all text inside ANY popup panel to dark */
+.popup__content *,
+.popup-button-list *,
+.step-nav__popup *,
+.step-nav__popup .popup__content * {
+  color: #1f2937 !important;
+  opacity: 1 !important;
 }
 .popup__content button,
 .popup-button-list button,
-.popup-button-list__button {
-  color: #1f2937 !important;
+.popup-button-list__button,
+.step-nav__popup button {
   background: transparent !important;
   border: none !important;
+  font-weight: 500 !important;
 }
 .popup__content button:hover,
 .popup-button-list button:hover,
-.popup-button-list__button:hover {
+.popup-button-list__button:hover,
+.step-nav__popup button:hover {
   background: #f3f4f6 !important;
   color: #111827 !important;
 }
