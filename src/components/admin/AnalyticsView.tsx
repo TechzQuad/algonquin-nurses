@@ -1,111 +1,117 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { SetStepNav } from "@payloadcms/ui";
 import {
-  AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
-  XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
+  AreaChart, Area, BarChart, Bar, PieChart, Pie,
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from "recharts";
 
-// ─── Types & helpers ──────────────────────────────────────────────────────────
+// ─── Palette ─────────────────────────────────────────────────────────────────
 
-type Doc = { createdAt: string };
-
-const FORM_SOURCES = [
-  { key: "contact-submissions", label: "Contact",          color: "#0d9488" },
-  { key: "referrals",           label: "Referrals",        color: "#3b5d95" },
-  { key: "feedback",            label: "Feedback",         color: "#f59e0b" },
-  { key: "applications",        label: "Job Applications", color: "#2d4a78" },
-  { key: "chat-leads",          label: "Chat Leads",       color: "#7c3aed" },
-];
-
-const PALETTE = {
-  primary: "#3b5d95",
-  accent:  "#0d9488",
-  bg:      "#f4f7fb",
-  card:    "#ffffff",
-  border:  "#e5e7eb",
-  text:    "#1a1a2e",
-  muted:   "#6b7280",
-  grid:    "#f3f4f6",
+const P = {
+  primary:  "#3b5d95",
+  accent:   "#0d9488",
+  bg:       "#f4f7fb",
+  card:     "#ffffff",
+  border:   "#e5e7eb",
+  text:     "#1a1a2e",
+  muted:    "#6b7280",
+  grid:     "#f3f4f6",
+  green:    "#10b981",
+  red:      "#ef4444",
+  amber:    "#f59e0b",
+  purple:   "#7c3aed",
 };
 
-function fmt(n: number): string {
-  if (n >= 1000) return `${(n / 1000).toFixed(1)}k`;
-  return String(n);
-}
+// ─── Dummy data ───────────────────────────────────────────────────────────────
 
-function monthLabel(d: Date) {
-  return d.toLocaleDateString("en-US", { month: "short", year: "2-digit" });
-}
-function dayLabel(d: Date) {
-  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
-}
+const TRAFFIC_30D = [
+  { day: "May 1",  users: 42,  sessions: 58,  pageviews: 143 },
+  { day: "May 2",  users: 38,  sessions: 51,  pageviews: 120 },
+  { day: "May 3",  users: 55,  sessions: 74,  pageviews: 198 },
+  { day: "May 4",  users: 61,  sessions: 83,  pageviews: 211 },
+  { day: "May 5",  users: 70,  sessions: 95,  pageviews: 252 },
+  { day: "May 6",  users: 48,  sessions: 63,  pageviews: 160 },
+  { day: "May 7",  users: 35,  sessions: 44,  pageviews: 110 },
+  { day: "May 8",  users: 72,  sessions: 98,  pageviews: 264 },
+  { day: "May 9",  users: 80,  sessions: 109, pageviews: 291 },
+  { day: "May 10", users: 88,  sessions: 118, pageviews: 310 },
+  { day: "May 11", users: 65,  sessions: 87,  pageviews: 223 },
+  { day: "May 12", users: 59,  sessions: 79,  pageviews: 201 },
+  { day: "May 13", users: 44,  sessions: 59,  pageviews: 148 },
+  { day: "May 14", users: 50,  sessions: 68,  pageviews: 175 },
+  { day: "May 15", users: 93,  sessions: 124, pageviews: 338 },
+  { day: "May 16", users: 102, sessions: 136, pageviews: 367 },
+  { day: "May 17", users: 97,  sessions: 130, pageviews: 351 },
+  { day: "May 18", users: 85,  sessions: 114, pageviews: 305 },
+  { day: "May 19", users: 78,  sessions: 104, pageviews: 278 },
+  { day: "May 20", users: 110, sessions: 148, pageviews: 402 },
+  { day: "May 21", users: 125, sessions: 168, pageviews: 451 },
+  { day: "May 22", users: 118, sessions: 158, pageviews: 426 },
+  { day: "May 23", users: 108, sessions: 144, pageviews: 390 },
+  { day: "May 24", users: 95,  sessions: 127, pageviews: 341 },
+  { day: "May 25", users: 82,  sessions: 110, pageviews: 294 },
+  { day: "May 26", users: 76,  sessions: 101, pageviews: 271 },
+  { day: "May 27", users: 133, sessions: 178, pageviews: 480 },
+  { day: "May 28", users: 145, sessions: 194, pageviews: 523 },
+  { day: "May 29", users: 138, sessions: 185, pageviews: 498 },
+  { day: "May 30", users: 152, sessions: 203, pageviews: 547 },
+];
 
-function buildMonthlyTrend(
-  datasets: Record<string, Doc[]>,
-  months = 6
-): { month: string; [k: string]: number | string }[] {
-  const now   = new Date();
-  const rows: { month: string; [k: string]: number | string }[] = [];
+const CHANNELS = [
+  { name: "Organic Search", value: 42, color: P.accent  },
+  { name: "Direct",         value: 28, color: P.primary },
+  { name: "Referral",       value: 16, color: P.amber   },
+  { name: "Social",         value: 10, color: P.purple  },
+  { name: "Other",          value: 4,  color: P.muted   },
+];
 
-  for (let i = months - 1; i >= 0; i--) {
-    const d     = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const row: { month: string; [k: string]: number | string } = { month: monthLabel(d) };
-    FORM_SOURCES.forEach(({ key, label }) => {
-      row[label] = (datasets[key] ?? []).filter((doc) => {
-        const cd = new Date(doc.createdAt);
-        return cd.getFullYear() === d.getFullYear() && cd.getMonth() === d.getMonth();
-      }).length;
-    });
-    rows.push(row);
-  }
-  return rows;
-}
+const TOP_PAGES = [
+  { page: "/",                            title: "Home",                  views: 1842, avgTime: "2m 14s", bounce: "38%" },
+  { page: "/services/medicaid-in-home-care", title: "Medicaid In-Home Care", views: 1204, avgTime: "3m 08s", bounce: "29%" },
+  { page: "/careers",                     title: "Careers",               views: 987,  avgTime: "2m 51s", bounce: "34%" },
+  { page: "/contact",                     title: "Contact",               views: 854,  avgTime: "1m 44s", bounce: "42%" },
+  { page: "/client-referral",             title: "Client Referral",       views: 621,  avgTime: "2m 22s", bounce: "31%" },
+  { page: "/blog",                        title: "Blog",                  views: 543,  avgTime: "2m 59s", bounce: "45%" },
+  { page: "/services/consumer-directed",  title: "Consumer Directed Svcs",views: 498,  avgTime: "3m 14s", bounce: "27%" },
+  { page: "/feedback",                    title: "Feedback",              views: 312,  avgTime: "1m 33s", bounce: "50%" },
+];
 
-function buildDailyTrend(
-  datasets: Record<string, Doc[]>,
-  days = 30
-): { day: string; total: number }[] {
-  const now  = new Date();
-  const rows = [];
-  for (let i = days - 1; i >= 0; i--) {
-    const d    = new Date(now);
-    d.setDate(now.getDate() - i);
-    const total = Object.values(datasets).flat().filter((doc) => {
-      const cd = new Date(doc.createdAt);
-      return (
-        cd.getFullYear() === d.getFullYear() &&
-        cd.getMonth() === d.getMonth() &&
-        cd.getDate() === d.getDate()
-      );
-    }).length;
-    rows.push({ day: dayLabel(d), total });
-  }
-  return rows;
-}
+const DEVICES = [
+  { name: "Mobile",  value: 58, color: P.accent  },
+  { name: "Desktop", value: 34, color: P.primary },
+  { name: "Tablet",  value: 8,  color: P.amber   },
+];
+
+const MONTHLY_USERS = [
+  { month: "Dec",  users: 1240 },
+  { month: "Jan",  users: 1580 },
+  { month: "Feb",  users: 1390 },
+  { month: "Mar",  users: 1820 },
+  { month: "Apr",  users: 2140 },
+  { month: "May",  users: 2680 },
+];
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function KpiCard({ label, value, sub, color }: { label: string; value: number | string; sub: string; color: string }) {
+function KpiCard({ label, value, sub, color, trend }: {
+  label: string; value: string; sub: string; color: string; trend?: "up" | "down";
+}) {
   return (
-    <div
-      style={{
-        background:   PALETTE.card,
-        border:       `1px solid ${PALETTE.border}`,
-        borderRadius: "14px",
-        padding:      "22px 24px",
-        borderTop:    `3px solid ${color}`,
-        flex:         1,
-        minWidth:     0,
-      }}
-    >
-      <p style={{ margin: "0 0 8px", fontSize: "12px", fontWeight: 600, color: PALETTE.muted, textTransform: "uppercase", letterSpacing: "0.07em" }}>
+    <div style={{
+      background: P.card, border: `1px solid ${P.border}`, borderRadius: "14px",
+      padding: "20px 24px", borderTop: `3px solid ${color}`, flex: 1, minWidth: 0,
+    }}>
+      <p style={{ margin: "0 0 8px", fontSize: "11px", fontWeight: 700, color: P.muted, textTransform: "uppercase", letterSpacing: "0.07em" }}>
         {label}
       </p>
-      <p style={{ margin: "0 0 6px", fontSize: "32px", fontWeight: 800, color: PALETTE.text, lineHeight: 1 }}>
-        {fmt(Number(value))}
+      <p style={{ margin: "0 0 6px", fontSize: "30px", fontWeight: 800, color: P.text, lineHeight: 1 }}>
+        {value}
       </p>
-      <p style={{ margin: 0, fontSize: "12px", color: PALETTE.muted }}>{sub}</p>
+      <p style={{ margin: 0, fontSize: "12px", color: trend === "up" ? P.green : trend === "down" ? P.red : P.muted }}>
+        {trend === "up" ? "↑ " : trend === "down" ? "↓ " : ""}{sub}
+      </p>
     </div>
   );
 }
@@ -113,12 +119,12 @@ function KpiCard({ label, value, sub, color }: { label: string; value: number | 
 const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: { name: string; value: number; color: string }[]; label?: string }) => {
   if (!active || !payload?.length) return null;
   return (
-    <div style={{ background: "#fff", border: `1px solid ${PALETTE.border}`, borderRadius: "10px", padding: "12px 16px", boxShadow: "0 4px 20px rgba(0,0,0,0.1)" }}>
-      <p style={{ margin: "0 0 8px", fontSize: "12px", fontWeight: 700, color: PALETTE.text }}>{label}</p>
+    <div style={{ background: "#fff", border: `1px solid ${P.border}`, borderRadius: "10px", padding: "12px 16px", boxShadow: "0 4px 20px rgba(0,0,0,0.1)" }}>
+      <p style={{ margin: "0 0 8px", fontSize: "12px", fontWeight: 700, color: P.text }}>{label}</p>
       {payload.map((p) => (
-        <p key={p.name} style={{ margin: "2px 0", fontSize: "12px", color: PALETTE.muted }}>
+        <p key={p.name} style={{ margin: "2px 0", fontSize: "12px", color: P.muted }}>
           <span style={{ display: "inline-block", width: "8px", height: "8px", borderRadius: "50%", background: p.color, marginRight: "6px" }} />
-          {p.name}: <strong style={{ color: PALETTE.text }}>{p.value}</strong>
+          {p.name}: <strong style={{ color: P.text }}>{p.value.toLocaleString()}</strong>
         </p>
       ))}
     </div>
@@ -127,193 +133,196 @@ const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?:
 
 // ─── Main view ────────────────────────────────────────────────────────────────
 
+type Tab = "30d" | "12m";
+
 export function AnalyticsView() {
-  const [datasets, setDatasets] = useState<Record<string, Doc[]>>({});
-  const [loading,  setLoading]  = useState(true);
+  const [tab, setTab] = useState<Tab>("30d");
 
-  useEffect(() => {
-    let active = true;
-    async function load() {
-      const result: Record<string, Doc[]> = {};
-      await Promise.allSettled(
-        FORM_SOURCES.map(async ({ key }) => {
-          try {
-            const res = await fetch(`/api/${key}?limit=1000&depth=0&sort=-createdAt`, { credentials: "include" });
-            if (res.ok) {
-              const data = await res.json();
-              result[key] = data.docs ?? [];
-            }
-          } catch { /* ignore */ }
-        })
-      );
-      if (active) { setDatasets(result); setLoading(false); }
-    }
-    load();
-    return () => { active = false; };
-  }, []);
+  const totals30d = TRAFFIC_30D.reduce((a, r) => ({
+    users:     a.users     + r.users,
+    sessions:  a.sessions  + r.sessions,
+    pageviews: a.pageviews + r.pageviews,
+  }), { users: 0, sessions: 0, pageviews: 0 });
 
-  // Computed metrics
-  const totals    = FORM_SOURCES.map(({ key, label, color }) => ({ label, color, value: (datasets[key] ?? []).length }));
-  const allDocs   = Object.values(datasets).flat();
-  const now       = new Date();
-  const thisMonth = allDocs.filter((d) => {
-    const cd = new Date(d.createdAt);
-    return cd.getMonth() === now.getMonth() && cd.getFullYear() === now.getFullYear();
-  }).length;
-  const lastMonth = allDocs.filter((d) => {
-    const cd = new Date(d.createdAt);
-    const lm = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-    return cd.getMonth() === lm.getMonth() && cd.getFullYear() === lm.getFullYear();
-  }).length;
-  const thisWeek  = allDocs.filter((d) => {
-    const cd   = new Date(d.createdAt);
-    const diff = (now.getTime() - cd.getTime()) / 86400000;
-    return diff <= 7;
-  }).length;
-
-  const monthlyData = buildMonthlyTrend(datasets, 6);
-  const dailyData   = buildDailyTrend(datasets, 30);
-
-  const pieData = totals.filter((t) => t.value > 0).map((t) => ({ name: t.label, value: t.value, color: t.color }));
-
-  const s = {
-    page: { padding: "32px 36px", background: PALETTE.bg, minHeight: "100vh", fontFamily: "-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" },
-    header: { marginBottom: "28px" },
-    h1: { margin: "0 0 6px", fontSize: "24px", fontWeight: 800, color: PALETTE.text } as React.CSSProperties,
-    sub: { margin: 0, fontSize: "14px", color: PALETTE.muted } as React.CSSProperties,
-    row: { display: "flex", gap: "16px", marginBottom: "24px", flexWrap: "wrap" as const },
-    card: { background: PALETTE.card, border: `1px solid ${PALETTE.border}`, borderRadius: "14px", padding: "24px" } as React.CSSProperties,
-    cardTitle: { margin: "0 0 20px", fontSize: "14px", fontWeight: 700, color: PALETTE.text } as React.CSSProperties,
+  const card: React.CSSProperties = {
+    background: P.card, border: `1px solid ${P.border}`, borderRadius: "14px", padding: "24px",
+  };
+  const cardTitle: React.CSSProperties = {
+    margin: "0 0 20px", fontSize: "14px", fontWeight: 700, color: P.text,
+  };
+  const row: React.CSSProperties = {
+    display: "flex", gap: "16px", marginBottom: "24px", flexWrap: "wrap",
   };
 
-  if (loading) {
-    return (
-      <div style={{ ...s.page, display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <div style={{ textAlign: "center" }}>
-          <div style={{ width: "40px", height: "40px", border: "3px solid #e5e7eb", borderTopColor: PALETTE.accent, borderRadius: "50%", margin: "0 auto 16px", animation: "spin 0.8s linear infinite" }} />
-          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-          <p style={{ color: PALETTE.muted, fontSize: "14px" }}>Loading analytics…</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div style={s.page}>
+    <div style={{ padding: "32px 36px", background: P.bg, minHeight: "100vh", fontFamily: "-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" }}>
+      <SetStepNav nav={[{ label: "Analytics" }]} />
+
       {/* Header */}
-      <div style={s.header}>
-        <h1 style={s.h1}>Analytics</h1>
-        <p style={s.sub}>Form submissions overview — all time</p>
+      <div style={{ marginBottom: "28px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
+        <div>
+          <h1 style={{ margin: "0 0 4px", fontSize: "24px", fontWeight: 800, color: P.text }}>Analytics</h1>
+          <p style={{ margin: 0, fontSize: "14px", color: P.muted }}>Website traffic overview — demo data</p>
+        </div>
+        {/* Tab switcher */}
+        <div style={{ display: "flex", background: "#e5e7eb", borderRadius: "8px", padding: "3px" }}>
+          {(["30d", "12m"] as Tab[]).map((t) => (
+            <button
+              key={t}
+              onClick={() => setTab(t)}
+              style={{
+                padding: "6px 16px", borderRadius: "6px", border: "none", cursor: "pointer",
+                fontSize: "13px", fontWeight: 600,
+                background: tab === t ? "#fff" : "transparent",
+                color: tab === t ? P.text : P.muted,
+                boxShadow: tab === t ? "0 1px 4px rgba(0,0,0,0.1)" : "none",
+                transition: "all 0.15s",
+              }}
+            >
+              {t === "30d" ? "Last 30 days" : "Last 6 months"}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* KPI row */}
-      <div style={s.row}>
-        <KpiCard label="Total Submissions"  value={allDocs.length} sub="All forms combined"           color={PALETTE.accent}  />
-        <KpiCard label="This Month"         value={thisMonth}      sub={`${lastMonth} last month`}    color={PALETTE.primary} />
-        <KpiCard label="This Week"          value={thisWeek}       sub="Last 7 days"                  color="#7c3aed"         />
-        <KpiCard label="Avg Per Month"      value={monthlyData.length ? Math.round(monthlyData.reduce((a, r) => a + FORM_SOURCES.reduce((s, f) => s + Number(r[f.label] || 0), 0), 0) / monthlyData.length) : 0} sub="6-month average" color="#f59e0b" />
+      <div style={row}>
+        <KpiCard label="Total Users"       value={totals30d.users.toLocaleString()}     sub="+18% vs prev period"   color={P.accent}   trend="up"   />
+        <KpiCard label="Sessions"          value={totals30d.sessions.toLocaleString()}  sub="+14% vs prev period"   color={P.primary}  trend="up"   />
+        <KpiCard label="Pageviews"         value={totals30d.pageviews.toLocaleString()} sub="+21% vs prev period"   color={P.purple}   trend="up"   />
+        <KpiCard label="Avg Bounce Rate"   value="38.4%"                                sub="-3.2% vs prev period"  color={P.green}    trend="up"   />
+        <KpiCard label="Avg Session Time"  value="2m 34s"                               sub="+0.4s vs prev period"  color={P.amber}    trend="up"   />
       </div>
 
-      {/* Daily trend + pie */}
-      <div style={{ ...s.row, alignItems: "flex-start" }}>
-        {/* Daily area chart */}
-        <div style={{ ...s.card, flex: "2 1 400px" }}>
-          <p style={s.cardTitle}>Daily Submissions — Last 30 Days</p>
-          <ResponsiveContainer width="100%" height={220}>
-            <AreaChart data={dailyData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
-              <defs>
-                <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%"  stopColor={PALETTE.accent} stopOpacity={0.25} />
-                  <stop offset="95%" stopColor={PALETTE.accent} stopOpacity={0}    />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke={PALETTE.grid} vertical={false} />
-              <XAxis dataKey="day" tick={{ fontSize: 10, fill: PALETTE.muted }} tickLine={false} interval={4} />
-              <YAxis tick={{ fontSize: 10, fill: PALETTE.muted }} tickLine={false} axisLine={false} allowDecimals={false} />
-              <Tooltip content={<CustomTooltip />} />
-              <Area type="monotone" dataKey="total" name="Submissions" stroke={PALETTE.accent} strokeWidth={2.5} fill="url(#areaGrad)" dot={false} activeDot={{ r: 5, fill: PALETTE.accent }} />
-            </AreaChart>
+      {/* Traffic chart + channels */}
+      <div style={{ ...row, alignItems: "flex-start" }}>
+        <div style={{ ...card, flex: "2 1 420px" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" }}>
+            <p style={{ ...cardTitle, margin: 0 }}>
+              {tab === "30d" ? "Daily Traffic — Last 30 Days" : "Monthly Users — Last 6 Months"}
+            </p>
+          </div>
+          <ResponsiveContainer width="100%" height={240}>
+            {tab === "30d" ? (
+              <AreaChart data={TRAFFIC_30D} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="gUsers"     x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%"  stopColor={P.accent}  stopOpacity={0.2} />
+                    <stop offset="95%" stopColor={P.accent}  stopOpacity={0}   />
+                  </linearGradient>
+                  <linearGradient id="gSessions"  x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%"  stopColor={P.primary} stopOpacity={0.15} />
+                    <stop offset="95%" stopColor={P.primary} stopOpacity={0}    />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke={P.grid} vertical={false} />
+                <XAxis dataKey="day"      tick={{ fontSize: 10, fill: P.muted }} tickLine={false} interval={4} />
+                <YAxis                    tick={{ fontSize: 10, fill: P.muted }} tickLine={false} axisLine={false} allowDecimals={false} />
+                <Tooltip content={<CustomTooltip />} />
+                <Legend wrapperStyle={{ fontSize: "12px", paddingTop: "12px" }} />
+                <Area type="monotone" dataKey="users"    name="Users"    stroke={P.accent}  strokeWidth={2} fill="url(#gUsers)"    dot={false} activeDot={{ r: 4 }} />
+                <Area type="monotone" dataKey="sessions" name="Sessions" stroke={P.primary} strokeWidth={2} fill="url(#gSessions)" dot={false} activeDot={{ r: 4 }} />
+              </AreaChart>
+            ) : (
+              <BarChart data={MONTHLY_USERS} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke={P.grid} vertical={false} />
+                <XAxis dataKey="month" tick={{ fontSize: 11, fill: P.muted }} tickLine={false} />
+                <YAxis                 tick={{ fontSize: 11, fill: P.muted }} tickLine={false} axisLine={false} allowDecimals={false} />
+                <Tooltip content={<CustomTooltip />} />
+                <Bar dataKey="users" name="Users" fill={P.accent} radius={[6, 6, 0, 0]} />
+              </BarChart>
+            )}
           </ResponsiveContainer>
         </div>
 
-        {/* Pie chart */}
-        <div style={{ ...s.card, flex: "1 1 220px" }}>
-          <p style={s.cardTitle}>Submissions by Form</p>
-          {pieData.length > 0 ? (
-            <>
-              <ResponsiveContainer width="100%" height={180}>
-                <PieChart>
-                  <Pie data={pieData} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={3} dataKey="value">
-                    {pieData.map((entry, i) => (
-                      <Cell key={i} fill={entry.color} stroke="none" />
-                    ))}
-                  </Pie>
-                  <Tooltip formatter={(v) => [v, ""]} />
-                </PieChart>
-              </ResponsiveContainer>
-              <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginTop: "8px" }}>
-                {pieData.map((d) => (
-                  <div key={d.name} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "12px" }}>
-                    <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                      <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: d.color, flexShrink: 0 }} />
-                      <span style={{ color: PALETTE.muted }}>{d.name}</span>
-                    </span>
-                    <span style={{ fontWeight: 700, color: PALETTE.text }}>{d.value}</span>
-                  </div>
+        {/* Traffic channels */}
+        <div style={{ ...card, flex: "1 1 220px" }}>
+          <p style={cardTitle}>Traffic by Channel</p>
+          <ResponsiveContainer width="100%" height={170}>
+            <PieChart>
+              <Pie data={CHANNELS} cx="50%" cy="50%" innerRadius={45} outerRadius={75} paddingAngle={3} dataKey="value">
+                {CHANNELS.map((c, i) => (
+                  <g key={i}>
+                    <path key={i} fill={c.color} />
+                  </g>
                 ))}
+              </Pie>
+              <Tooltip formatter={(v) => [`${v}%`, ""]} />
+            </PieChart>
+          </ResponsiveContainer>
+          <div style={{ display: "flex", flexDirection: "column", gap: "7px", marginTop: "8px" }}>
+            {CHANNELS.map((c) => (
+              <div key={c.name} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "12px" }}>
+                <span style={{ display: "flex", alignItems: "center", gap: "7px" }}>
+                  <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: c.color, flexShrink: 0 }} />
+                  <span style={{ color: P.muted }}>{c.name}</span>
+                </span>
+                <strong style={{ color: P.text }}>{c.value}%</strong>
               </div>
-            </>
-          ) : (
-            <p style={{ textAlign: "center", color: PALETTE.muted, fontSize: "13px", paddingTop: "40px" }}>No data yet</p>
-          )}
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* Monthly stacked bar */}
-      <div style={{ ...s.card, marginBottom: "24px" }}>
-        <p style={s.cardTitle}>Monthly Submissions by Form — Last 6 Months</p>
-        <ResponsiveContainer width="100%" height={260}>
-          <BarChart data={monthlyData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke={PALETTE.grid} vertical={false} />
-            <XAxis dataKey="month" tick={{ fontSize: 11, fill: PALETTE.muted }} tickLine={false} />
-            <YAxis tick={{ fontSize: 11, fill: PALETTE.muted }} tickLine={false} axisLine={false} allowDecimals={false} />
-            <Tooltip content={<CustomTooltip />} />
-            <Legend wrapperStyle={{ fontSize: "12px", paddingTop: "12px" }} />
-            {FORM_SOURCES.map(({ label, color }) => (
-              <Bar key={label} dataKey={label} stackId="a" fill={color} radius={label === FORM_SOURCES[FORM_SOURCES.length - 1].label ? [4,4,0,0] : [0,0,0,0]} />
+      {/* Devices + top pages */}
+      <div style={{ ...row, alignItems: "flex-start" }}>
+        {/* Devices */}
+        <div style={{ ...card, flex: "1 1 200px" }}>
+          <p style={cardTitle}>Devices</p>
+          <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+            {DEVICES.map((d) => (
+              <div key={d.name}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "5px", fontSize: "13px" }}>
+                  <span style={{ color: P.muted }}>{d.name}</span>
+                  <strong style={{ color: P.text }}>{d.value}%</strong>
+                </div>
+                <div style={{ height: "6px", background: "#e5e7eb", borderRadius: "99px", overflow: "hidden" }}>
+                  <div style={{ height: "100%", width: `${d.value}%`, background: d.color, borderRadius: "99px", transition: "width 0.6s ease" }} />
+                </div>
+              </div>
             ))}
-          </BarChart>
-        </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Top pages */}
+        <div style={{ ...card, flex: "3 1 400px", overflow: "hidden" }}>
+          <p style={cardTitle}>Top Pages</p>
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
+              <thead>
+                <tr>
+                  {["Page", "Views", "Avg Time", "Bounce"].map((h) => (
+                    <th key={h} style={{ textAlign: "left", padding: "0 12px 10px 0", fontSize: "11px", fontWeight: 700, color: P.muted, textTransform: "uppercase", letterSpacing: "0.06em", borderBottom: `1px solid ${P.border}` }}>
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {TOP_PAGES.map((row, i) => (
+                  <tr key={row.page} style={{ background: i % 2 === 0 ? "transparent" : "#f9fafb" }}>
+                    <td style={{ padding: "10px 12px 10px 0", color: P.primary, fontWeight: 500 }}>
+                      {row.title}
+                      <span style={{ display: "block", fontSize: "11px", color: P.muted, fontWeight: 400 }}>{row.page}</span>
+                    </td>
+                    <td style={{ padding: "10px 12px 10px 0", color: P.text, fontWeight: 600 }}>{row.views.toLocaleString()}</td>
+                    <td style={{ padding: "10px 12px 10px 0", color: P.muted }}>{row.avgTime}</td>
+                    <td style={{ padding: "10px 12px 10px 0" }}>
+                      <span style={{ fontSize: "12px", fontWeight: 600, color: parseFloat(row.bounce) < 35 ? P.green : parseFloat(row.bounce) > 44 ? P.red : P.amber }}>
+                        {row.bounce}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
 
-      {/* Per-source cards */}
-      <div style={s.row}>
-        {FORM_SOURCES.map(({ key, label, color }) => {
-          const docs = datasets[key] ?? [];
-          const monthCount = docs.filter((d) => {
-            const cd = new Date(d.createdAt);
-            return cd.getMonth() === now.getMonth() && cd.getFullYear() === now.getFullYear();
-          }).length;
-          return (
-            <div
-              key={key}
-              style={{
-                background:   PALETTE.card,
-                border:       `1px solid ${PALETTE.border}`,
-                borderRadius: "12px",
-                padding:      "18px 20px",
-                flex:         "1 1 160px",
-                borderTop:    `3px solid ${color}`,
-              }}
-            >
-              <p style={{ margin: "0 0 10px", fontSize: "12px", fontWeight: 600, color: PALETTE.muted, textTransform: "uppercase", letterSpacing: "0.07em" }}>{label}</p>
-              <p style={{ margin: "0 0 4px", fontSize: "26px", fontWeight: 800, color: PALETTE.text, lineHeight: 1 }}>{docs.length}</p>
-              <p style={{ margin: 0, fontSize: "11px", color: PALETTE.muted }}>
-                <span style={{ color, fontWeight: 600 }}>{monthCount}</span> this month
-              </p>
-            </div>
-          );
-        })}
+      {/* Notice */}
+      <div style={{ background: "#fffbeb", border: "1px solid #fde68a", borderRadius: "10px", padding: "14px 18px", fontSize: "13px", color: "#92400e" }}>
+        <strong>Demo data</strong> — Connect Google Analytics 4 to see real traffic metrics.
       </div>
     </div>
   );

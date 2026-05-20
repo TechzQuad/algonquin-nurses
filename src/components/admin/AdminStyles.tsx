@@ -172,20 +172,25 @@ export function AdminStyles() {
 .app-header svg .stroke {
   stroke: rgba(210,228,255,0.8) !important;
 }
-/* Breadcrumb / step-nav text white */
+/* Breadcrumb / step-nav + all header text → white */
 .step-nav,
-.step-nav a,
-.step-nav button,
-.step-nav span,
+.step-nav *,
 .app-header__step-nav-wrapper,
-.app-header__step-nav-wrapper a,
-.app-header__step-nav-wrapper button,
-.app-header__step-nav-wrapper span {
+.app-header__step-nav-wrapper *,
+.app-header__content,
+.app-header__content *,
+.app-header h1,
+.app-header h2,
+.app-header h3,
+.app-header p,
+.app-header li,
+.app-header label {
   color: #ffffff !important;
   opacity: 1 !important;
 }
-.step-nav svg .stroke {
-  stroke: rgba(255,255,255,0.6) !important;
+.step-nav svg .stroke,
+.app-header__content svg .stroke {
+  stroke: rgba(255,255,255,0.7) !important;
 }
 
 /* ── Breathing room between header and page body ── */
