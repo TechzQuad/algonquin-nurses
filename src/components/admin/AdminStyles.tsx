@@ -291,32 +291,24 @@ export function AdminStyles() {
   color: #111827 !important;
 }
 
-/* ── Buttons inside the app header ── */
-/* Secondary / outline buttons (default Payload style) */
+/* ── All buttons inside the app header — uniform translucent style ── */
 .app-header .btn,
+.app-header .btn--style-primary,
 .app-header .btn--style-secondary,
-.app-header .btn--style-pill {
+.app-header .btn--style-pill,
+.app-header [class*="btn"] {
   background: rgba(255,255,255,0.15) !important;
   border: 1px solid rgba(255,255,255,0.35) !important;
   color: #ffffff !important;
   border-radius: 8px !important;
 }
 .app-header .btn:hover,
+.app-header .btn--style-primary:hover,
 .app-header .btn--style-secondary:hover,
-.app-header .btn--style-pill:hover {
+.app-header .btn--style-pill:hover,
+.app-header [class*="btn"]:hover {
   background: rgba(255,255,255,0.25) !important;
   border-color: rgba(255,255,255,0.55) !important;
-}
-/* Primary / save button */
-.app-header .btn--style-primary {
-  background: #0d9488 !important;
-  border: 1px solid #0d9488 !important;
-  color: #ffffff !important;
-  border-radius: 8px !important;
-}
-.app-header .btn--style-primary:hover {
-  background: #0f766e !important;
-  border-color: #0f766e !important;
 }
 
 /* ── Primary buttons (outside header) ── */
