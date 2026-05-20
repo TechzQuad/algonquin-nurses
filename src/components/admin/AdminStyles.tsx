@@ -240,7 +240,35 @@ export function AdminStyles() {
   display: none !important;
 }
 
-/* ── Primary buttons ── */
+/* ── Buttons inside the app header ── */
+/* Secondary / outline buttons (default Payload style) */
+.app-header .btn,
+.app-header .btn--style-secondary,
+.app-header .btn--style-pill {
+  background: rgba(255,255,255,0.15) !important;
+  border: 1px solid rgba(255,255,255,0.35) !important;
+  color: #ffffff !important;
+  border-radius: 8px !important;
+}
+.app-header .btn:hover,
+.app-header .btn--style-secondary:hover,
+.app-header .btn--style-pill:hover {
+  background: rgba(255,255,255,0.25) !important;
+  border-color: rgba(255,255,255,0.55) !important;
+}
+/* Primary / save button */
+.app-header .btn--style-primary {
+  background: #0d9488 !important;
+  border: 1px solid #0d9488 !important;
+  color: #ffffff !important;
+  border-radius: 8px !important;
+}
+.app-header .btn--style-primary:hover {
+  background: #0f766e !important;
+  border-color: #0f766e !important;
+}
+
+/* ── Primary buttons (outside header) ── */
 .btn--style-primary {
   border-radius: 8px !important;
 }
