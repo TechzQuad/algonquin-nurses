@@ -29,11 +29,22 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
+    meta: {
+      titleSuffix: "— Algonquin Nurses CMS",
+    },
+    components: {
+      graphics: {
+        Logo: "@/components/admin/AdminLogo#AdminLogo",
+        Icon: "@/components/admin/AdminIcon#AdminIcon",
+      },
+      beforeDashboard: ["@/components/admin/BeforeDashboard#BeforeDashboard"],
+      header:          ["@/components/admin/AdminStyles#AdminStyles"],
+    },
     livePreview: {
       breakpoints: [
-        { label: "Mobile", name: "mobile", width: 390, height: 844 },
-        { label: "Tablet", name: "tablet", width: 768, height: 1024 },
-        { label: "Desktop", name: "desktop", width: 1440, height: 900 },
+        { label: "Mobile",  name: "mobile",  width: 390,  height: 844  },
+        { label: "Tablet",  name: "tablet",  width: 768,  height: 1024 },
+        { label: "Desktop", name: "desktop", width: 1440, height: 900  },
       ],
     },
   },
