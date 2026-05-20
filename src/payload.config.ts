@@ -37,8 +37,15 @@ export default buildConfig({
         Logo: "@/components/admin/AdminLogo#AdminLogo",
         Icon: "@/components/admin/AdminIcon#AdminIcon",
       },
-      beforeDashboard: ["@/components/admin/BeforeDashboard#BeforeDashboard"],
-      header:          ["@/components/admin/AdminStyles#AdminStyles"],
+      beforeDashboard:  ["@/components/admin/BeforeDashboard#BeforeDashboard"],
+      header:           ["@/components/admin/AdminStyles#AdminStyles"],
+      beforeNavLinks:   ["@/components/admin/AdminNav#AdminNav"],
+      views: {
+        analytics: {
+          Component: "@/components/admin/AnalyticsView#AnalyticsView",
+          path: "/analytics",
+        },
+      },
     },
     livePreview: {
       breakpoints: [

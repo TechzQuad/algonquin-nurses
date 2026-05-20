@@ -144,6 +144,33 @@ export function AdminStyles() {
   color: #0f766e !important;
 }
 
+/* ── Persistent sidebar on desktop ── */
+@media (min-width: 1024px) {
+  /* Force nav visible at all times */
+  .nav {
+    opacity: 1 !important;
+    transform: none !important;
+    pointer-events: auto !important;
+    position: sticky !important;
+    top: 0 !important;
+    height: 100vh !important;
+    overflow-y: auto !important;
+  }
+  /* Hide the hamburger / nav toggler */
+  .nav-toggler,
+  .template-default__nav-toggler-wrapper,
+  [class*="nav-toggler"] {
+    display: none !important;
+  }
+}
+
+/* ── Hide Payload's auto-generated nav items (we inject our own) ── */
+.nav .nav__wrap > .nav-group,
+.nav .nav__wrap > nav,
+.nav .nav__wrap > ul {
+  display: none !important;
+}
+
 /* ── Dashboard header bar ── */
 .app-header {
   border-bottom: 1px solid rgba(59,93,149,0.12) !important;
