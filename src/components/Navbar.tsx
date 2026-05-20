@@ -94,7 +94,7 @@ export function Navbar() {
                 onMouseEnter={() => setAboutOpen(true)}
                 onMouseLeave={() => setAboutOpen(false)}
               >
-                <button className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-neutral-700 hover:text-primary rounded-lg hover:bg-neutral-50 transition-colors">
+                <button className="flex items-center gap-1 px-4 py-2 text-[15px] font-medium text-neutral-700 hover:text-primary rounded-lg hover:bg-neutral-50 transition-colors">
                   About
                   <ChevronDown className={cn("w-4 h-4 transition-transform", aboutOpen && "rotate-180")} />
                 </button>
@@ -111,7 +111,7 @@ export function Navbar() {
                         <Link
                           key={link.href}
                           href={link.href}
-                          className="block px-4 py-2.5 text-sm text-neutral-700 hover:bg-primary/5 hover:text-primary transition-colors"
+                          className="block px-4 py-2.5 text-[15px] text-neutral-700 hover:bg-primary/5 hover:text-primary transition-colors"
                         >
                           {link.name}
                         </Link>
@@ -127,7 +127,7 @@ export function Navbar() {
                 onMouseEnter={() => setServicesOpen(true)}
                 onMouseLeave={() => setServicesOpen(false)}
               >
-                <button className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-neutral-700 hover:text-primary rounded-lg hover:bg-neutral-50 transition-colors">
+                <button className="flex items-center gap-1 px-4 py-2 text-[15px] font-medium text-neutral-700 hover:text-primary rounded-lg hover:bg-neutral-50 transition-colors">
                   Services
                   <ChevronDown className={cn("w-4 h-4 transition-transform", servicesOpen && "rotate-180")} />
                 </button>
@@ -144,7 +144,7 @@ export function Navbar() {
                         <Link
                           key={service.href}
                           href={service.href}
-                          className="block px-4 py-2.5 text-sm text-neutral-700 hover:bg-primary/5 hover:text-primary transition-colors"
+                          className="block px-4 py-2.5 text-[15px] text-neutral-700 hover:bg-primary/5 hover:text-primary transition-colors"
                         >
                           {service.name}
                         </Link>
@@ -154,22 +154,22 @@ export function Navbar() {
                 </AnimatePresence>
               </div>
 
-              <Link href="/client-referral" className="px-4 py-2 text-sm font-medium text-neutral-700 hover:text-primary rounded-lg hover:bg-neutral-50 transition-colors">
+              <Link href="/client-referral" className="px-4 py-2 text-[15px] font-medium text-neutral-700 hover:text-primary rounded-lg hover:bg-neutral-50 transition-colors">
                 Referral
               </Link>
-              <Link href="/careers" className="px-4 py-2 text-sm font-medium text-neutral-700 hover:text-primary rounded-lg hover:bg-neutral-50 transition-colors">
+              <Link href="/careers" className="px-4 py-2 text-[15px] font-medium text-neutral-700 hover:text-primary rounded-lg hover:bg-neutral-50 transition-colors">
                 Careers
               </Link>
-              <Link href="/blog" className="px-4 py-2 text-sm font-medium text-neutral-700 hover:text-primary rounded-lg hover:bg-neutral-50 transition-colors">
+              <Link href="/blog" className="px-4 py-2 text-[15px] font-medium text-neutral-700 hover:text-primary rounded-lg hover:bg-neutral-50 transition-colors">
                 Blog
               </Link>
-              <Link href="/contact" className="px-4 py-2 text-sm font-medium text-neutral-700 hover:text-primary rounded-lg hover:bg-neutral-50 transition-colors">
+              <Link href="/contact" className="px-4 py-2 text-[15px] font-medium text-neutral-700 hover:text-primary rounded-lg hover:bg-neutral-50 transition-colors">
                 Contact
               </Link>
 
               <Link
                 href="/contact"
-                className="ml-3 px-5 py-2.5 bg-accent hover:bg-accent-light text-white text-sm font-semibold rounded-lg transition-colors shadow-sm"
+                className="ml-3 px-5 py-2.5 bg-accent hover:bg-accent-light text-white text-[15px] font-semibold rounded-lg transition-colors shadow-sm"
               >
                 Free Consultation
               </Link>
