@@ -3,23 +3,31 @@
 import { useNav } from "@payloadcms/ui";
 import { useEffect } from "react";
 
+function removeNavInert() {
+  const nav = document.querySelector(".nav");
+  if (nav) (nav as HTMLElement).removeAttribute("inert");
+}
+
 export function NavOpener() {
   const { hydrated, setNavOpen } = useNav();
 
-  // After Payload finishes hydrating (and potentially closing the nav),
-  // force it open on desktop. This runs in the next tick after hydration.
   useEffect(() => {
     if (!hydrated) return;
     if (window.innerWidth > 768) {
       setNavOpen(true);
+      // Direct DOM fallback in case React state alone isn't enough
+      removeNavInert();
+      // Also retry after a short delay for slow hydration
+      setTimeout(removeNavInert, 100);
+      setTimeout(removeNavInert, 400);
     }
   }, [hydrated, setNavOpen]);
 
-  // Re-open if window resizes back to desktop after being mobile
   useEffect(() => {
     const handler = () => {
       if (window.innerWidth > 768) {
         setNavOpen(true);
+        removeNavInert();
       }
     };
     window.addEventListener("resize", handler);
