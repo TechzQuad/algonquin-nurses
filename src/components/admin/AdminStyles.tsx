@@ -144,22 +144,26 @@ export function AdminStyles() {
   color: #0f766e !important;
 }
 
-/* ── App header — match sidebar navy ── */
+/* ── App header + nav__header — exact same colour as sidebar top ── */
 .app-header {
-  background-color: #243d6a !important;
-  border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+  background-color: #2d4a78 !important;
+  border-bottom: 1px solid rgba(255,255,255,0.08) !important;
 }
-/* The bg overlay: force same color in case --show-bg class fires */
+/* Kill the animated bg overlay so it never flashes a different colour */
 .app-header__bg {
-  background-color: #243d6a !important;
+  background-color: #2d4a78 !important;
   opacity: 1 !important;
 }
-/* All text + icon colors in header */
+/* Make the logo strip inside the sidebar the same shade */
+.nav__header {
+  background-color: #2d4a78 !important;
+}
+/* All header text / icons → white */
 .app-header,
 .app-header a,
 .app-header button,
-.app-header span:not([class*="badge"]) {
-  color: rgba(210,228,255,0.9) !important;
+.app-header span {
+  color: rgba(210,228,255,0.92) !important;
 }
 .app-header a:hover,
 .app-header button:hover {
@@ -168,12 +172,16 @@ export function AdminStyles() {
 .app-header svg .stroke {
   stroke: rgba(210,228,255,0.8) !important;
 }
-/* Nav header inside the sidebar — keep matching */
-.nav__header {
-  background: #243d6a !important;
+
+/* ── Space below header ── */
+.template-default__wrap > *:first-child,
+.render-header + *,
+.payload-default__wrap > *:first-child {
+  margin-top: 12px;
 }
-.nav__header-content {
-  background: transparent !important;
+/* The actual content container Payload uses */
+.template-default__wrap {
+  padding-top: 12px !important;
 }
 
 /* ── Persistent sidebar on desktop ── */
