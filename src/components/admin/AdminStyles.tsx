@@ -144,23 +144,21 @@ export function AdminStyles() {
   color: #0f766e !important;
 }
 
-/* ── App header — matches sidebar navy ── */
+/* ── App header — match sidebar navy ── */
+.app-header {
+  background-color: #243d6a !important;
+  border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+}
+/* The bg overlay: force same color in case --show-bg class fires */
+.app-header__bg {
+  background-color: #243d6a !important;
+  opacity: 1 !important;
+}
+/* All text + icon colors in header */
 .app-header,
-.app-header__bg,
-.app-header__wrapper {
-  background: #243d6a !important;
-  border-bottom: 1px solid rgba(255,255,255,0.08) !important;
-}
-.app-header__content,
-.app-header__controls-wrapper,
-.app-header__actions-wrapper {
-  background: transparent !important;
-}
-/* Header text / icons white */
 .app-header a,
 .app-header button,
-.app-header svg,
-.app-header [class*="step"] {
+.app-header span:not([class*="badge"]) {
   color: rgba(210,228,255,0.9) !important;
 }
 .app-header a:hover,
@@ -170,10 +168,12 @@ export function AdminStyles() {
 .app-header svg .stroke {
   stroke: rgba(210,228,255,0.8) !important;
 }
-/* "Dashboard" breadcrumb text */
-.app-header__step-header,
-.app-header__step-nav-wrapper {
-  color: #ffffff !important;
+/* Nav header inside the sidebar — keep matching */
+.nav__header {
+  background: #243d6a !important;
+}
+.nav__header-content {
+  background: transparent !important;
 }
 
 /* ── Persistent sidebar on desktop ── */

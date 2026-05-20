@@ -39,7 +39,7 @@ export default buildConfig({
       },
       beforeDashboard:  ["@/components/admin/BeforeDashboard#BeforeDashboard"],
       header:           ["@/components/admin/AdminStyles#AdminStyles"],
-      beforeNavLinks:   ["@/components/admin/AdminNav#AdminNav"],
+      beforeNavLinks:   ["@/components/admin/NavOpener#NavOpener", "@/components/admin/AdminNav#AdminNav"],
       views: {
         analytics: {
           Component: "@/components/admin/AnalyticsView#AnalyticsView",
