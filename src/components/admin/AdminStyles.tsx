@@ -240,75 +240,41 @@ export function AdminStyles() {
   display: none !important;
 }
 
-/* ── Dropdowns / popups inside the app header (e.g. "Reset Layout") ── */
-.app-header .popup__button,
-.app-header .popup-button-list__button,
-.app-header [class*="dropdown"] button,
-.app-header [class*="popup"] button {
-  background: rgba(255,255,255,0.15) !important;
-  border: 1px solid rgba(255,255,255,0.35) !important;
+/* ── All action buttons in the app header — uniform translucent style ── */
+.app-header .btn {
+  background: rgba(255,255,255,0.12) !important;
+  border: 1px solid rgba(255,255,255,0.30) !important;
   color: #ffffff !important;
   border-radius: 8px !important;
+  box-shadow: none !important;
 }
-.app-header .popup__button:hover,
-.app-header .popup-button-list__button:hover,
-.app-header [class*="dropdown"] button:hover,
-.app-header [class*="popup"] button:hover {
-  background: rgba(255,255,255,0.25) !important;
-  border-color: rgba(255,255,255,0.55) !important;
+.app-header .btn:hover {
+  background: rgba(255,255,255,0.22) !important;
+  border-color: rgba(255,255,255,0.50) !important;
 }
-/* Popup / dropdown menu panel that opens (light bg, dark text for readability) */
+
+/* ── Popup / dropdown menu panel (white bg, dark text) ── */
 .popup__content,
-.popup-button-list,
-.step-nav__popup,
-.step-nav__popup .popup__content {
+.popup-button-list {
   background: #ffffff !important;
   border: 1px solid #e5e7eb !important;
   border-radius: 8px !important;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.18) !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15) !important;
 }
-/* Force all text inside ANY popup panel to dark */
 .popup__content *,
-.popup-button-list *,
-.step-nav__popup *,
-.step-nav__popup .popup__content * {
+.popup-button-list * {
   color: #1f2937 !important;
   opacity: 1 !important;
 }
 .popup__content button,
-.popup-button-list button,
-.popup-button-list__button,
-.step-nav__popup button {
+.popup-button-list button {
   background: transparent !important;
   border: none !important;
-  font-weight: 500 !important;
+  box-shadow: none !important;
 }
 .popup__content button:hover,
-.popup-button-list button:hover,
-.popup-button-list__button:hover,
-.step-nav__popup button:hover {
+.popup-button-list button:hover {
   background: #f3f4f6 !important;
-  color: #111827 !important;
-}
-
-/* ── All buttons inside the app header — uniform translucent style ── */
-.app-header .btn,
-.app-header .btn--style-primary,
-.app-header .btn--style-secondary,
-.app-header .btn--style-pill,
-.app-header [class*="btn"] {
-  background: rgba(255,255,255,0.15) !important;
-  border: 1px solid rgba(255,255,255,0.35) !important;
-  color: #ffffff !important;
-  border-radius: 8px !important;
-}
-.app-header .btn:hover,
-.app-header .btn--style-primary:hover,
-.app-header .btn--style-secondary:hover,
-.app-header .btn--style-pill:hover,
-.app-header [class*="btn"]:hover {
-  background: rgba(255,255,255,0.25) !important;
-  border-color: rgba(255,255,255,0.55) !important;
 }
 
 /* ── Primary buttons (outside header) ── */
