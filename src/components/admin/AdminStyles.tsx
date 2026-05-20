@@ -240,6 +240,45 @@ export function AdminStyles() {
   display: none !important;
 }
 
+/* ── Dropdowns / popups inside the app header (e.g. "Reset Layout") ── */
+.app-header .popup__button,
+.app-header .popup-button-list__button,
+.app-header [class*="dropdown"] button,
+.app-header [class*="popup"] button {
+  background: rgba(255,255,255,0.15) !important;
+  border: 1px solid rgba(255,255,255,0.35) !important;
+  color: #ffffff !important;
+  border-radius: 8px !important;
+}
+.app-header .popup__button:hover,
+.app-header .popup-button-list__button:hover,
+.app-header [class*="dropdown"] button:hover,
+.app-header [class*="popup"] button:hover {
+  background: rgba(255,255,255,0.25) !important;
+  border-color: rgba(255,255,255,0.55) !important;
+}
+/* Popup / dropdown menu panel that opens (render in light bg for readability) */
+.popup__content,
+.popup-button-list {
+  background: #ffffff !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 8px !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15) !important;
+}
+.popup__content button,
+.popup-button-list button,
+.popup-button-list__button {
+  color: #1f2937 !important;
+  background: transparent !important;
+  border: none !important;
+}
+.popup__content button:hover,
+.popup-button-list button:hover,
+.popup-button-list__button:hover {
+  background: #f3f4f6 !important;
+  color: #111827 !important;
+}
+
 /* ── Buttons inside the app header ── */
 /* Secondary / outline buttons (default Payload style) */
 .app-header .btn,
