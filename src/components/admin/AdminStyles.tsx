@@ -145,29 +145,26 @@ export function AdminStyles() {
 }
 
 /* ── Persistent sidebar on desktop ── */
-@media (min-width: 1024px) {
-  /* Force nav visible at all times */
-  .nav {
-    opacity: 1 !important;
-    transform: none !important;
-    pointer-events: auto !important;
-    position: sticky !important;
-    top: 0 !important;
-    height: 100vh !important;
-    overflow-y: auto !important;
+@media (min-width: 769px) {
+  /* Expand the grid column so the nav takes up space */
+  .template-default--nav-hydrated {
+    grid-template-columns: var(--nav-width) auto !important;
   }
-  /* Hide the hamburger / nav toggler */
-  .nav-toggler,
-  .template-default__nav-toggler-wrapper,
-  [class*="nav-toggler"] {
+  /* Make nav visible — Payload hides it with display:none on ≤1440px */
+  .template-default .nav,
+  .template-default--nav-hydrated .nav {
+    display: flex !important;
+    flex-direction: column !important;
+    opacity: 1 !important;
+  }
+  /* Hide the hamburger toggler — nav is always open */
+  .template-default__nav-toggler-wrapper {
     display: none !important;
   }
 }
 
-/* ── Hide Payload's auto-generated nav items (we inject our own) ── */
-.nav .nav__wrap > .nav-group,
-.nav .nav__wrap > nav,
-.nav .nav__wrap > ul {
+/* ── Hide Payload's auto-generated nav groups (we supply our own) ── */
+.nav__wrap > .nav-group {
   display: none !important;
 }
 
