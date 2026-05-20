@@ -179,9 +179,9 @@ export function AdminStyles() {
   border-radius: 8px !important;
 }
 
-/* ── Collection cards (dashboard) ── */
-.dashboard__wrap {
-  padding-top: 0 !important;
+/* ── Hide default collection card grid on dashboard ── */
+.collections__wrap {
+  display: none !important;
 }
 `,
       }}
