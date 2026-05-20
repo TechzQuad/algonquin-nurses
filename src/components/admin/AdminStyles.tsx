@@ -144,34 +144,73 @@ export function AdminStyles() {
   color: #0f766e !important;
 }
 
+/* ── App header — matches sidebar navy ── */
+.app-header,
+.app-header__bg,
+.app-header__wrapper {
+  background: #243d6a !important;
+  border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+}
+.app-header__content,
+.app-header__controls-wrapper,
+.app-header__actions-wrapper {
+  background: transparent !important;
+}
+/* Header text / icons white */
+.app-header a,
+.app-header button,
+.app-header svg,
+.app-header [class*="step"] {
+  color: rgba(210,228,255,0.9) !important;
+}
+.app-header a:hover,
+.app-header button:hover {
+  color: #ffffff !important;
+}
+.app-header svg .stroke {
+  stroke: rgba(210,228,255,0.8) !important;
+}
+/* "Dashboard" breadcrumb text */
+.app-header__step-header,
+.app-header__step-nav-wrapper {
+  color: #ffffff !important;
+}
+
 /* ── Persistent sidebar on desktop ── */
 @media (min-width: 769px) {
-  /* Expand the grid column so the nav takes up space */
   .template-default--nav-hydrated {
     grid-template-columns: var(--nav-width) auto !important;
   }
-  /* Make nav visible — Payload hides it with display:none on ≤1440px */
   .template-default .nav,
   .template-default--nav-hydrated .nav {
     display: flex !important;
     flex-direction: column !important;
     opacity: 1 !important;
+    pointer-events: auto !important;
+    position: sticky !important;
   }
-  /* Hide the hamburger toggler — nav is always open */
+  .template-default .nav *,
+  .template-default--nav-hydrated .nav * {
+    pointer-events: auto !important;
+  }
   .template-default__nav-toggler-wrapper {
     display: none !important;
+  }
+}
+
+/* ── Mobile: let Payload handle sidebar toggle ── */
+@media (max-width: 768px) {
+  .template-default__nav-toggler-wrapper {
+    display: flex !important;
+  }
+  .app-header__mobile-nav-toggler {
+    display: flex !important;
   }
 }
 
 /* ── Hide Payload's auto-generated nav groups (we supply our own) ── */
 .nav__wrap > .nav-group {
   display: none !important;
-}
-
-/* ── Dashboard header bar ── */
-.app-header {
-  border-bottom: 1px solid rgba(59,93,149,0.12) !important;
-  background: #fff !important;
 }
 
 /* ── Primary buttons ── */
@@ -182,6 +221,13 @@ export function AdminStyles() {
 /* ── Hide default collection card grid on dashboard ── */
 .collections__wrap {
   display: none !important;
+}
+
+/* ── Responsive: tighten admin content padding on small screens ── */
+@media (max-width: 768px) {
+  .template-default__wrap {
+    padding-inline: 16px !important;
+  }
 }
 `,
       }}
