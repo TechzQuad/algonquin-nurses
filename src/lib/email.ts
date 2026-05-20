@@ -12,7 +12,7 @@ const transporter = nodemailer.createTransport({
 
 const FROM      = `Algonquin Nurses <${process.env.SMTP_USER ?? "mail@algonquinnursesstl.online"}>`;
 const SITE_URL  = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.algonquinnurses.com";
-const ADMIN_URL = `${SITE_URL}/admin`;
+const ADMIN_URL = "https://www.algonquinnursesstl.com/admin";
 const YEAR      = new Date().getFullYear();
 
 const C = {
