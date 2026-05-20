@@ -95,11 +95,6 @@ export function BeforeDashboard() {
         }}
       >
         <div>
-          <img
-            src="/images/ofl.png"
-            alt="Algonquin Nurses"
-            style={{ height: '38px', width: 'auto', filter: 'brightness(0) invert(1)', marginBottom: '12px', display: 'block' }}
-          />
           <h1 style={{ margin: '0 0 6px', fontSize: '21px', fontWeight: 700, color: '#fff', lineHeight: 1.3 }}>
             Welcome to Algonquin Nurses CMS
           </h1>
@@ -223,10 +218,6 @@ export function BeforeDashboard() {
         </div>
       </div>
 
-      <div style={{ height: '1px', background: 'linear-gradient(90deg, #e5e7eb 0%, transparent 100%)', margin: '28px 0 4px' }} />
-      <p style={{ margin: 0, fontSize: '11px', color: '#9ca3af' }}>
-        All collections are listed below. Click any collection to view, add, or edit entries.
-      </p>
 
     </div>
   );

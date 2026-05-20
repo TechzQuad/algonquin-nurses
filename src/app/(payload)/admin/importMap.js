@@ -30,7 +30,7 @@ import { BeforeDashboard as BeforeDashboard_915324d4628771dbb8d31cdc4601c33e } f
 import { NavOpener as NavOpener_a4da871da312f8df72ec98cad1c28a9c } from '@/components/admin/NavOpener'
 import { AdminNav as AdminNav_2623bc737c612ce9420322f2210a7f19 } from '@/components/admin/AdminNav'
 import { VercelBlobClientUploadHandler as VercelBlobClientUploadHandler_16c82c5e25f430251a3e3ba57219ff4e } from '@payloadcms/storage-vercel-blob/client'
-import { AnalyticsView as AnalyticsView_db43129b90862b042c8e58805b1c34d3 } from '@/components/admin/AnalyticsView'
+import { default as default_eb94aaf993e4ffe50c5e9baadfa0713d } from '@/components/admin/AnalyticsPage'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
 export const importMap = {
@@ -66,6 +66,6 @@ export const importMap = {
   "@/components/admin/NavOpener#NavOpener": NavOpener_a4da871da312f8df72ec98cad1c28a9c,
   "@/components/admin/AdminNav#AdminNav": AdminNav_2623bc737c612ce9420322f2210a7f19,
   "@payloadcms/storage-vercel-blob/client#VercelBlobClientUploadHandler": VercelBlobClientUploadHandler_16c82c5e25f430251a3e3ba57219ff4e,
-  "@/components/admin/AnalyticsView#AnalyticsView": AnalyticsView_db43129b90862b042c8e58805b1c34d3,
+  "@/components/admin/AnalyticsPage#default": default_eb94aaf993e4ffe50c5e9baadfa0713d,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }

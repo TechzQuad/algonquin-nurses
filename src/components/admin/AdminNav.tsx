@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import {
-  LayoutDashboard, BarChart2, Image, Users, MessageSquare,
+  LayoutDashboard, BarChart2, Image, Users,
   FileText, ClipboardList, UserCog, Settings, ChevronRight,
-  PlusCircle, Tag, Layers, Phone, Share2, Star, Briefcase, MessageCircle,
+  Star,
 } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -66,42 +66,13 @@ const MENU: Section[] = [
   },
 ];
 
-// Slugs that need counts fetched
-const ALL_SLUGS = [
-  "media","team","testimonials","posts","categories",
-  "contact-submissions","referrals","feedback","applications","chat-leads","users",
-];
-
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function AdminNav() {
   const pathname = usePathname();
-  const [counts, setCounts]   = useState<Record<string, number>>({});
-  const [open, setOpen]       = useState<Record<string, boolean>>({
+  const [open, setOpen] = useState<Record<string, boolean>>({
     "Posts": true, "All Forms": true,
   });
-
-  // Fetch counts from Payload REST API
-  useEffect(() => {
-    let active = true;
-    async function fetchCounts() {
-      const results: Record<string, number> = {};
-      await Promise.allSettled(
-        ALL_SLUGS.map(async (slug) => {
-          try {
-            const res = await fetch(`/api/${slug}?limit=0&depth=0`, { credentials: "include" });
-            if (res.ok) {
-              const data = await res.json();
-              results[slug] = data.totalDocs ?? 0;
-            }
-          } catch { /* ignore */ }
-        })
-      );
-      if (active) setCounts(results);
-    }
-    fetchCounts();
-    return () => { active = false; };
-  }, []);
 
   // Active-state helper
   function isActive(href: string) {
@@ -158,20 +129,6 @@ export function AdminNav() {
       flex:     1,
       minWidth: 0,
     } as React.CSSProperties,
-    badge: (n: number): React.CSSProperties => ({
-      display:       "inline-flex",
-      alignItems:    "center",
-      justifyContent:"center",
-      minWidth:      "20px",
-      height:        "18px",
-      padding:       "0 5px",
-      background:    n > 0 ? "rgba(13,148,136,0.25)" : "rgba(255,255,255,0.08)",
-      borderRadius:  "50px",
-      fontSize:      "10px",
-      fontWeight:    700,
-      color:         n > 0 ? "#5eead4" : "rgba(255,255,255,0.3)",
-      flexShrink:    0,
-    }),
     subItem: (active: boolean): React.CSSProperties => ({
       display:        "flex",
       alignItems:     "center",
@@ -205,16 +162,12 @@ export function AdminNav() {
           {section.items.map((item) => {
             if (item.type === "link") {
               const active = isActive(item.href);
-              const count  = item.apiSlug != null ? counts[item.apiSlug] : undefined;
               return (
                 <Link key={item.href} href={item.href} style={s.linkBase(active)}>
                   <span style={s.labelWrap}>
                     <span style={s.iconWrap(active)}>{item.icon}</span>
                     <span>{item.label}</span>
                   </span>
-                  {count != null && (
-                    <span style={s.badge(count)}>{count > 999 ? "999+" : count}</span>
-                  )}
                 </Link>
               );
             }
@@ -255,16 +208,9 @@ export function AdminNav() {
                   <div style={{ paddingBottom: "2px" }}>
                     {item.children.map((child) => {
                       const active = isActive(child.href);
-                      const count  = child.apiSlug != null ? counts[child.apiSlug] : undefined;
                       return (
                         <Link key={child.href} href={child.href} style={s.subItem(active)}>
-                          <span
-                            style={{
-                              display:    "flex",
-                              alignItems: "center",
-                              gap:        "6px",
-                            }}
-                          >
+                          <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                             <span
                               style={{
                                 width:        "4px",
@@ -276,9 +222,6 @@ export function AdminNav() {
                             />
                             {child.label}
                           </span>
-                          {count != null && (
-                            <span style={s.badge(count)}>{count > 999 ? "999+" : count}</span>
-                          )}
                         </Link>
                       );
                     })}

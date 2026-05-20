@@ -172,16 +172,30 @@ export function AdminStyles() {
 .app-header svg .stroke {
   stroke: rgba(210,228,255,0.8) !important;
 }
-
-/* ── Space below header ── */
-.template-default__wrap > *:first-child,
-.render-header + *,
-.payload-default__wrap > *:first-child {
-  margin-top: 12px;
+/* Breadcrumb / step-nav text white */
+.step-nav,
+.step-nav a,
+.step-nav button,
+.step-nav span,
+.app-header__step-nav-wrapper,
+.app-header__step-nav-wrapper a,
+.app-header__step-nav-wrapper button,
+.app-header__step-nav-wrapper span {
+  color: #ffffff !important;
+  opacity: 1 !important;
 }
-/* The actual content container Payload uses */
-.template-default__wrap {
-  padding-top: 12px !important;
+.step-nav svg .stroke {
+  stroke: rgba(255,255,255,0.6) !important;
+}
+
+/* ── Breathing room between header and page body ── */
+.gutter--left,
+.gutter--right {
+  padding-top: 28px !important;
+}
+/* Dashboard-specific: add top padding to the before-dashboard + collection area */
+.dashboard__wrap {
+  padding-top: 20px !important;
 }
 
 /* ── Persistent sidebar on desktop ── */

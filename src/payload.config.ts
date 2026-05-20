@@ -42,7 +42,7 @@ export default buildConfig({
       beforeNavLinks:   ["@/components/admin/NavOpener#NavOpener", "@/components/admin/AdminNav#AdminNav"],
       views: {
         analytics: {
-          Component: "@/components/admin/AnalyticsView#AnalyticsView",
+          Component: "@/components/admin/AnalyticsPage#default",
           path: "/analytics",
         },
       },
